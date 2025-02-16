@@ -36,6 +36,13 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		return
 	}
 
+	if cfg.robotGroup != nil {
+		if !cfg.robotGroup.Test(parsedCurrentURL.Path) {
+			fmt.Printf("URL %s is not allowed to crawl\n", parsedCurrentURL.String())
+			return
+		}
+	}
+
 	cfg.mu.Lock()
 	if _, ok := cfg.pages[norCurrentURL]; ok {
 		cfg.pages[norCurrentURL]++

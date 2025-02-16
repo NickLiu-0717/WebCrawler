@@ -30,7 +30,7 @@ func getHTML(rawURL string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		return "", fmt.Errorf("error: response with code %v", resp.StatusCode)
+		return "", fmt.Errorf("error: URL %s response with code %v", parseURL.String(), resp.StatusCode)
 	}
 	contentType := resp.Header.Get("Content-Type")
 	if !strings.Contains(contentType, "text/html") {

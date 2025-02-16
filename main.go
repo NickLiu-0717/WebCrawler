@@ -52,11 +52,19 @@ func main() {
 			return
 		}
 	}
+
 	cfg, err := configure(cmdArg[1], maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Printf("Error - couldn't configure: %v\n", err)
 		return
 	}
+
+	group, err := checkRobotsTxt(cfg.baseURL.String())
+	if err != nil {
+		fmt.Printf("Error - couldn't check robots.txt: %v\n", err)
+		return
+	}
+	cfg.robotGroup = group
 
 	cfg.wg.Add(1)
 	go cfg.crawlPage(cfg.baseURL.String())

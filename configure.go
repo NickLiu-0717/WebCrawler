@@ -7,6 +7,8 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/temoto/robotstxt"
 )
 
 type urlCount struct {
@@ -21,6 +23,7 @@ type config struct {
 	concurrencyControl chan struct{}
 	wg                 *sync.WaitGroup
 	maxPages           int
+	robotGroup         *robotstxt.Group
 }
 
 func configure(rawBaseURL string, maxConcurrency, maxPages int) (*config, error) {
