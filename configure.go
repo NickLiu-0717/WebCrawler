@@ -24,9 +24,10 @@ type config struct {
 	wg                 *sync.WaitGroup
 	maxPages           int
 	robotGroup         *robotstxt.Group
+	maxDepth           int
 }
 
-func configure(rawBaseURL string, maxConcurrency, maxPages int) (*config, error) {
+func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*config, error) {
 	baseURL, err := url.Parse(rawBaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't parse url %v : %v", rawBaseURL, err)
@@ -38,6 +39,7 @@ func configure(rawBaseURL string, maxConcurrency, maxPages int) (*config, error)
 		concurrencyControl: make(chan struct{}, maxConcurrency),
 		wg:                 &sync.WaitGroup{},
 		maxPages:           maxPages,
+		maxDepth:           maxDepth,
 	}, nil
 }
 

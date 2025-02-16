@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-func (cfg *config) crawlPage(rawCurrentURL string) {
+func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 
 	cfg.concurrencyControl <- struct{}{}
 	defer func() {
@@ -68,7 +68,7 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 	}
 	for _, nextURL := range URLs {
 		cfg.wg.Add(1)
-		go cfg.crawlPage(nextURL)
+		go cfg.crawlPage(nextURL, depth+1)
 	}
 
 }
