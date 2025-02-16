@@ -25,6 +25,7 @@ type config struct {
 	maxPages           int
 	robotGroup         *robotstxt.Group
 	maxDepth           int
+	articles           []string
 }
 
 func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*config, error) {

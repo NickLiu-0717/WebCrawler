@@ -122,4 +122,7 @@ func main() {
 	cfg.wg.Wait()
 
 	printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
+	for _, article := range cfg.articles {
+		fmt.Println(article)
+	}
 }

@@ -13,6 +13,10 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 		cfg.wg.Done()
 	}()
 
+	if depth > cfg.maxDepth {
+		return
+	}
+
 	cfg.mu.Lock()
 	if len(cfg.pages) >= cfg.maxPages {
 		cfg.mu.Unlock()
@@ -41,6 +45,10 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 			fmt.Printf("URL %s is not allowed to crawl\n", parsedCurrentURL.String())
 			return
 		}
+	}
+
+	if checkArticle(parsedCurrentURL.String()) {
+		cfg.articles = append(cfg.articles, parsedCurrentURL.String())
 	}
 
 	cfg.mu.Lock()
