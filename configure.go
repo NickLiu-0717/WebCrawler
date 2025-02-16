@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/url"
 	"sort"
 	"sync"
+	"time"
 )
 
 type urlCount struct {
@@ -59,4 +61,9 @@ func printPages(pages map[string]int, baseURL string) {
 		}
 		// fmt.Printf("%s: %d\n", uc.url, uc.count)
 	}
+}
+
+func randomSleep(min, max int) {
+	delay := rand.Intn(max-min) + min
+	time.Sleep(time.Duration(delay) * time.Millisecond)
 }

@@ -13,10 +13,20 @@ func getHTML(rawURL string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("couldn't parse raw URL: %v", err)
 	}
-	resp, err := http.Get(parseURL.String())
+
+	req, err := http.NewRequest("GET", parseURL.String(), nil)
+	if err != nil {
+		return "", fmt.Errorf("couldn't make new request: %v", err)
+	}
+
+	req.Header.Set("User-Agent", getRandomUserAgent())
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("couldn't get response from %s: %v", parseURL.String(), err)
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {

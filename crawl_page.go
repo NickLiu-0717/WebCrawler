@@ -47,7 +47,7 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 
 	fmt.Printf("Start crawling %s\n", rawCurrentURL)
 
-	// time.Sleep(time.Second * 2)
+	randomSleep(1000, 3000)
 	html, err := getHTML(parsedCurrentURL.String())
 
 	if err != nil {
