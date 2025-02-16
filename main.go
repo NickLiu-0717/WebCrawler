@@ -2,53 +2,65 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"os"
-	"sort"
+	"strconv"
+	"strings"
 )
 
-type urlCount struct {
-	url   string
-	count int
-}
+const defaultMaxConcurrency = 5
+const defaultMaxPages = 10
 
 func main() {
+	var maxConcurrency int
+	var maxPages int
+	var err error
 	cmdArg := os.Args
 
 	if len(cmdArg) == 1 {
-		fmt.Println("no website provided")
+		fmt.Println("Error - need arguments: website maxConcurrency maxPages")
 		os.Exit(1)
-	} else if len(cmdArg) > 2 {
-		fmt.Println("too many arguments provided")
+	}
+
+	if len(cmdArg) > 4 {
+		fmt.Println("Error - too many arguments provided")
 		os.Exit(1)
-	} else if len(cmdArg) == 2 {
-		_, err := url.Parse(cmdArg[1])
+	}
+
+	if len(cmdArg) == 2 {
+		maxConcurrency = defaultMaxConcurrency
+		maxPages = defaultMaxPages
+	}
+
+	if len(cmdArg) == 3 {
+		maxConcurrency, err = strconv.Atoi(cmdArg[2])
 		if err != nil {
-			fmt.Printf("couldn't parse url %v : %v\n", cmdArg[1], err)
-			os.Exit(1)
+			fmt.Println("Error - couldn't convert input string to integer")
+			return
+		}
+		maxPages = defaultMaxPages
+	}
+
+	if len(cmdArg) == 4 {
+		maxConcurrency, err = strconv.Atoi(cmdArg[2])
+		if err != nil {
+			fmt.Println("Error - couldn't convert input string to integer")
+			return
+		}
+		maxPages, err = strconv.Atoi(cmdArg[3])
+		if err != nil {
+			fmt.Println("Error - couldn't convert input string to integer")
+			return
 		}
 	}
-
-	rawURL := cmdArg[1]
-	pages := make(map[string]int)
-	crawlPage(rawURL, rawURL, pages)
-
-	// for url, count := range pages {
-	// 	fmt.Printf("%s: %d\n", url, count)
-	// }
-
-	var urlCounts []urlCount
-	for url, count := range pages {
-		urlCounts = append(urlCounts, urlCount{url, count})
+	cfg, err := configure(cmdArg[1], maxConcurrency, maxPages)
+	if err != nil {
+		fmt.Printf("Error - couldn't configure: %v\n", err)
+		return
 	}
 
-	// Sort the slice (you can use sort.Slice)
-	sort.Slice(urlCounts, func(i, j int) bool {
-		return urlCounts[i].count > urlCounts[j].count // '>' for descending order
-	})
+	cfg.wg.Add(1)
+	go cfg.crawlPage(cfg.baseURL.String())
+	cfg.wg.Wait()
 
-	// Print sorted results
-	for _, uc := range urlCounts {
-		fmt.Printf("%s: %d\n", uc.url, uc.count)
-	}
+	printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
 }
