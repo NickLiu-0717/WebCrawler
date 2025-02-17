@@ -11,6 +11,16 @@ const defaultMaxConcurrency = 5
 const defaultMaxPages = 10
 const defaultMaxDepth = 5
 
+// var newsPages []string = []string{
+// 	"https://www.bbc.com/",
+// 	"https://edition.cnn.com/",
+// 	"https://www.nytimes.com/",
+// 	"https://www.forbes.com/",
+// 	"https://news.ebc.net.tw",
+// 	"https://news.ltn.com.tw",
+// 	"https://news.pts.org.tw/",
+// }
+
 func main() {
 	var maxConcurrency int
 	var maxPages int

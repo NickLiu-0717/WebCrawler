@@ -26,20 +26,35 @@ func TestCheckArticle(t *testing.T) {
 		},
 		{
 			name:     "nytime article",
-			inputURL: "www.nytimes.com/2025/02/16/world/africa/in-latest-advance-rebels-in-congo-say-they-have-entered-a-key-city.html",
+			inputURL: "https://www.nytimes.com/2025/02/16/world/africa/in-latest-advance-rebels-in-congo-say-they-have-entered-a-key-city.html",
 			expected: true,
 		},
 		{
 			name:     "nytime crosswords",
-			inputURL: "www.nytimes.com/crosswords",
+			inputURL: "https://www.nytimes.com/crosswords",
 			expected: false,
+		},
+		{
+			name:     "pts.org",
+			inputURL: "https://news.pts.org.tw/article/738105",
+			expected: true,
+		},
+		{
+			name:     "ebc.net",
+			inputURL: "https://news.ebc.net.tw/news/society/471990",
+			expected: true,
+		},
+		{
+			name:     "ltn.com",
+			inputURL: "https://news.ltn.com.tw/news/politics/breakingnews/4953899",
+			expected: true,
 		},
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			result := checkArticle(tc.inputURL)
 			if result != tc.expected {
-				t.Errorf("Test %d FAIL - expect: %v, got: %v", i, tc.expected, result)
+				t.Errorf("Test %d %v FAIL - expect: %v, got: %v", i, tc.name, tc.expected, result)
 			}
 		})
 	}

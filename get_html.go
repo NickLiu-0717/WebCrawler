@@ -18,7 +18,7 @@ func getHTML(rawURL string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("couldn't make new request: %v", err)
 	}
-
+	//Randomly pick User-Agent to prevent IP block
 	req.Header.Set("User-Agent", getRandomUserAgent())
 
 	client := &http.Client{}

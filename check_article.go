@@ -8,11 +8,16 @@ import (
 func checkArticle(url string) bool {
 	// 常見的文章 URL 格式（可依照實際網站調整）
 	articlePatterns := []string{
-		`/\d{4}/\d{2}/\d{2}/`, // YYYY/MM/DD 格式 (e.g., example.com/2024/02/16/title/)
-		`/posts/\d+`,          // post ID 格式 (e.g., example.com/posts/12345)
-		`/news/\d+`,           // e.g., example.com/news/67890
-		`/blog/[\w-]+`,        // 部落格標題 (e.g., example.com/blog/my-article-title)
-		`/news/articles/[a-zA-Z0-9]+$`,
+		`/\d{4}/\d{2}/\d{2}/`,          // YYYY/MM/DD 格式 (e.g., example.com/2024/02/16/title/)
+		`/posts/\d+`,                   // post ID 格式 (e.g., example.com/posts/12345)
+		`/news/\d+`,                    // e.g., example.com/news/67890
+		`/blog/[\w-]+`,                 // 部落格標題 (e.g., example.com/blog/my-article-title)
+		`/news/articles/[a-zA-Z0-9]+$`, //bbc.com
+		`/breakingnews/\d+`,            //ltn,com 自由時報
+		`/news/[a-z]+/\d+`,             //ebc.net 東森新聞
+		`/article/\d+`,                 //pts.org 公視新聞
+		`/\d{4}/[a-z]+/\d{2}/`,         //theguradian.com
+
 	}
 
 	// 不要的 URL（分類、標籤、登入等）

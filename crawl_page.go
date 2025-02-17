@@ -33,20 +33,20 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 	if cfg.baseURL.Hostname() != parsedCurrentURL.Hostname() {
 		return
 	}
-
+	//Normalize the path
 	norCurrentURL, err := normalizeURL(parsedCurrentURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't normalize current URL: %v\n", err)
 		return
 	}
-
+	//Test if the path has robots.txt restriction
 	if cfg.robotGroup != nil {
 		if !cfg.robotGroup.Test(parsedCurrentURL.Path) {
 			fmt.Printf("URL %s is not allowed to crawl\n", parsedCurrentURL.String())
 			return
 		}
 	}
-
+	//Check if the path is article or not
 	if checkArticle(parsedCurrentURL.String()) {
 		cfg.articles = append(cfg.articles, parsedCurrentURL.String())
 	}
@@ -61,8 +61,8 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 	cfg.mu.Unlock()
 
 	fmt.Printf("Start crawling %s\n", rawCurrentURL)
-
-	randomSleep(1000, 3000)
+	//Random Sleep to simulate human behavior
+	randomSleep(1000, 2000)
 	html, err := getHTML(parsedCurrentURL.String())
 
 	if err != nil {
