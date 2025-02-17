@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -30,6 +31,24 @@ func TestExtarctArticle(t *testing.T) {
 			expectedTitle: "DOGE Is Seeking Access To Critical IRS System That Holds Taxpayer Data—Here’s What To Know",
 			containString: "DOGE’s reported bid to gain access to the IRS systems comes just days",
 		},
+		{
+			name:          "EBC news 1",
+			inputURL:      "https://news.ebc.net.tw/news/living/471918",
+			expectedTitle: "只花69元！全聯開出1000萬發票 獎落縣市曝光",
+			containString: "特別獎號碼為「13965913」",
+		},
+		{
+			name:          "LTN news 1",
+			inputURL:      "https://estate.ltn.com.tw/article/23333",
+			expectedTitle: "高雄冬日遊樂園吸600萬參訪人潮",
+			containString: "今年高雄冬日遊樂園結合日本超人氣的「吉伊卡哇」IP",
+		},
+		{
+			name:          "LTM main page no article",
+			inputURL:      "https://www.ltn.com.tw/",
+			expectedTitle: "",
+			containString: "",
+		},
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -47,10 +66,10 @@ func TestExtarctArticle(t *testing.T) {
 			if !strings.Contains(gotcontent, tc.containString) {
 				t.Errorf("Test %d - %v FAIL: content not contain expected string %s", i, tc.name, tc.containString)
 			}
-			// if i == 2 {
-			// 	fmt.Println("Title:", gottitle)
-			// 	fmt.Println("\nContent:\n", gotcontent)
-			// }
+			if i == 5 {
+				fmt.Println("Title:", gottitle)
+				fmt.Println("\nContent:\n", gotcontent)
+			}
 		})
 	}
 

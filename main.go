@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
 const defaultMaxConcurrency = 5
@@ -14,7 +13,6 @@ const defaultMaxDepth = 5
 // var newsPages []string = []string{
 // 	"https://www.bbc.com/",
 // 	"https://edition.cnn.com/",
-// 	"https://www.nytimes.com/",
 // 	"https://www.forbes.com/",
 // 	"https://news.ebc.net.tw",
 // 	"https://news.ltn.com.tw",
@@ -27,43 +25,6 @@ func main() {
 	var maxDepth int
 	var err error
 	cmdArg := os.Args
-
-	// if len(cmdArg) == 1 {
-	// 	fmt.Println("Error - need arguments: website maxConcurrency maxPages")
-	// 	os.Exit(1)
-	// }
-
-	// if len(cmdArg) > 4 {
-	// 	fmt.Println("Error - too many arguments provided")
-	// 	os.Exit(1)
-	// }
-
-	// if len(cmdArg) == 2 {
-	// 	maxConcurrency = defaultMaxConcurrency
-	// 	maxPages = defaultMaxPages
-	// }
-
-	// if len(cmdArg) == 3 {
-	// 	maxConcurrency, err = strconv.Atoi(cmdArg[2])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxPages = defaultMaxPages
-	// }
-
-	// if len(cmdArg) == 4 {
-	// 	maxConcurrency, err = strconv.Atoi(cmdArg[2])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxPages, err = strconv.Atoi(cmdArg[3])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// }
 
 	switch len(cmdArg) {
 	case 1:
@@ -131,8 +92,8 @@ func main() {
 	go cfg.crawlPage(cfg.baseURL.String(), 1)
 	cfg.wg.Wait()
 
-	printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
-	for _, article := range cfg.articles {
-		fmt.Println(article)
+	// printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
+	for key, article := range cfg.articles {
+		fmt.Printf("From: %s, Title: %s\n", key, article.title)
 	}
 }

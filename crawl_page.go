@@ -46,10 +46,6 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 			return
 		}
 	}
-	//Check if the path is article or not
-	if checkArticle(parsedCurrentURL.String()) {
-		cfg.articles = append(cfg.articles, parsedCurrentURL.String())
-	}
 
 	cfg.mu.Lock()
 	if _, ok := cfg.pages[norCurrentURL]; ok {
@@ -64,11 +60,24 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 	//Random Sleep to simulate human behavior
 	randomSleep(1000, 2000)
 	html, err := getHTML(parsedCurrentURL.String())
-
 	if err != nil {
 		fmt.Printf("Error - couldn't get HTML: %v\n", err)
 		return
 	}
+	//Check if the path is article or not, if article, extract title and content then return, no more crawling
+	if checkArticle(parsedCurrentURL.String()) {
+		gottitle, gotcontent, err := extractArticles(html)
+		if err != nil {
+			fmt.Printf("Error - couldn't extract title and content from HTML: %v\n", err)
+			return
+		}
+		cfg.articles[norCurrentURL] = Article{
+			title:   gottitle,
+			content: gotcontent,
+		}
+		return
+	}
+
 	URLs, err := getURLsFromHTML(html, parsedCurrentURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't get URL from HTML: %v\n", err)
