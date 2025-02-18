@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	database "github.com/NickLiu-0717/crawler/internal/database"
 	"github.com/temoto/robotstxt"
 )
 
@@ -30,6 +31,7 @@ type config struct {
 	robotGroup         *robotstxt.Group
 	maxDepth           int
 	articles           map[string]Article
+	db                 *database.Queries
 }
 
 func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*config, error) {

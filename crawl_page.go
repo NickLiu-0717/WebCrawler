@@ -75,6 +75,11 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 			title:   gottitle,
 			content: gotcontent,
 		}
+		err = cfg.createArticles(norCurrentURL, gottitle, gotcontent)
+		if err != nil {
+			fmt.Printf("couldn't create article to database: %v\n", err)
+			return
+		}
 		return
 	}
 

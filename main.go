@@ -1,9 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
+
+	database "github.com/NickLiu-0717/crawler/internal/database"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 const defaultMaxConcurrency = 5
@@ -24,7 +30,20 @@ func main() {
 	var maxPages int
 	var maxDepth int
 	var err error
+
 	cmdArg := os.Args
+
+	godotenv.Load()
+
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL must be set")
+	}
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Printf("Error opening database: %s", err)
+	}
+	dbQueries := database.New(db)
 
 	switch len(cmdArg) {
 	case 1:
@@ -80,6 +99,7 @@ func main() {
 		fmt.Printf("Error - couldn't configure: %v\n", err)
 		return
 	}
+	cfg.db = dbQueries
 
 	group, err := checkRobotsTxt(cfg.baseURL.String())
 	if err != nil {
