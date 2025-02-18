@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest News</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #article-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Latest News Article</h1>
+    <div id="article-container">
+        <p>Loading article...</p>
+    </div>
+
+    <script>
+        async function fetchLatestArticle() {
+            try {
+                let response = await fetch("http://localhost:8080/api/articles");
+                if (!response.ok) {
+                    throw new Error("No articles available");
+                }
+                let article = await response.json();
+                
+                let container = document.getElementById("article-container");
+                container.innerHTML = `
+                    <h2>${article.title}</h2>
+                    <p>${article.content}</p>
+                    <small>Published: ${article.published_at}</small>
+                `;
+            } catch (error) {
+                document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
+                console.error("Error fetching article:", error);
+            }
+        }
+
+        fetchLatestArticle();
+    </script>
+</body>
+</html>

@@ -66,16 +66,16 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 	}
 	//Check if the path is article or not, if article, extract title and content then return, no more crawling
 	if checkArticle(parsedCurrentURL.String()) {
-		gottitle, gotcontent, err := extractArticles(html)
+		gottitle, gotcontent, gotpubAt, err := extractArticles(html)
 		if err != nil {
 			fmt.Printf("Error - couldn't extract title and content from HTML: %v\n", err)
 			return
 		}
-		cfg.articles[norCurrentURL] = Article{
-			title:   gottitle,
-			content: gotcontent,
-		}
-		err = cfg.createArticles(norCurrentURL, gottitle, gotcontent)
+		// cfg.articles[norCurrentURL] = Article{
+		// 	title:   gottitle,
+		// 	content: gotcontent,
+		// }
+		err = cfg.createArticles(norCurrentURL, gottitle, gotcontent, gotpubAt.UTC())
 		if err != nil {
 			fmt.Printf("couldn't create article to database: %v\n", err)
 			return

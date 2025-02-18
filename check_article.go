@@ -16,7 +16,6 @@ func checkArticle(url string) bool {
 		`/breakingnews/\d+`,            //ltn,com 自由時報
 		`/news/[a-z]+/\d+`,             //ebc.net 東森新聞
 		`/article/\d+`,                 //pts.org 公視新聞
-		`/\d{4}/[a-z]+/\d{2}/`,         //theguradian.com
 
 	}
 

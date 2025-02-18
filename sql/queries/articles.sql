@@ -1,5 +1,5 @@
 -- name: CreateArticle :one
-INSERT INTO articles (id, url, title, content, catagory, image_url, created_at)
+INSERT INTO articles (id, url, title, content, catagory, image_url, created_at, published_at)
 VALUES (
     gen_random_uuid(),
     $1,
@@ -7,13 +7,15 @@ VALUES (
     $3,
     $4,
     null,
-    NOW()
+    NOW(),
+    $5
 )
 RETURNING *;
 
 -- name: GetOneArticle :one
 Select * from articles
-where url = $1;
+order by RANDOM()
+limit 1;
 
 -- name: DeleteArticles :exec
 Delete from articles;

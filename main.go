@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 
@@ -39,11 +40,16 @@ func main() {
 	if dbURL == "" {
 		log.Fatal("DB_URL must be set")
 	}
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT must be set")
+	}
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Printf("Error opening database: %s", err)
 	}
 	dbQueries := database.New(db)
+	defer db.Close()
 
 	switch len(cmdArg) {
 	case 1:
@@ -113,7 +119,28 @@ func main() {
 	cfg.wg.Wait()
 
 	// printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
-	for key, article := range cfg.articles {
-		fmt.Printf("From: %s, Title: %s\n", key, article.title)
+	// for key, article := range cfg.articles {
+	// 	fmt.Printf("From: %s, Title: %s\n", key, article.title)
+	// }
+	apicfg := apiConfig{
+		db:   dbQueries,
+		port: port,
 	}
+
+	mux := http.NewServeMux()
+	server := &http.Server{
+		Addr:    ":" + apicfg.port,
+		Handler: mux,
+	}
+
+	fileServer := http.StripPrefix("/app/", http.FileServer(http.Dir("./")))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/app/", http.StatusFound)
+	})
+	mux.Handle("/app/", fileServer)
+	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
+	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
+
+	log.Printf("Serving on port: %s\n", port)
+	log.Fatal(server.ListenAndServe())
 }

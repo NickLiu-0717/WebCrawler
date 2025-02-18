@@ -12,11 +12,12 @@ import (
 )
 
 type Article struct {
-	ID        uuid.UUID
-	Url       string
-	Title     string
-	Content   string
-	Catagory  string
-	ImageUrl  sql.NullString
-	CreatedAt time.Time
+	ID          uuid.UUID
+	Url         string
+	Title       string
+	Content     string
+	Catagory    string
+	ImageUrl    sql.NullString
+	CreatedAt   time.Time
+	PublishedAt time.Time
 }

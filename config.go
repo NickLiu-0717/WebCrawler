@@ -8,6 +8,7 @@ import (
 	"time"
 
 	database "github.com/NickLiu-0717/crawler/internal/database"
+	"github.com/google/uuid"
 	"github.com/temoto/robotstxt"
 )
 
@@ -17,8 +18,19 @@ import (
 // }
 
 type Article struct {
-	title   string
-	content string
+	ID           uuid.UUID `json:"id"`
+	URL          string    `json:"url"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	Catagory     string    `json:"catagory"`
+	ImageUrl     string    `json:"image_url"`
+	Created_at   time.Time `json:"created_at"`
+	Published_at time.Time `json:"published_at"`
+}
+
+type apiConfig struct {
+	db   *database.Queries
+	port string
 }
 
 type config struct {
@@ -30,7 +42,6 @@ type config struct {
 	maxPages           int
 	robotGroup         *robotstxt.Group
 	maxDepth           int
-	articles           map[string]Article
 	db                 *database.Queries
 }
 
@@ -47,7 +58,6 @@ func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*conf
 		wg:                 &sync.WaitGroup{},
 		maxPages:           maxPages,
 		maxDepth:           maxDepth,
-		articles:           make(map[string]Article),
 	}, nil
 }
 

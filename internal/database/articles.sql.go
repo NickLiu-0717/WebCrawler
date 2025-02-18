@@ -7,10 +7,11 @@ package database
 
 import (
 	"context"
+	"time"
 )
 
 const createArticle = `-- name: CreateArticle :one
-INSERT INTO articles (id, url, title, content, catagory, image_url, created_at)
+INSERT INTO articles (id, url, title, content, catagory, image_url, created_at, published_at)
 VALUES (
     gen_random_uuid(),
     $1,
@@ -18,16 +19,18 @@ VALUES (
     $3,
     $4,
     null,
-    NOW()
+    NOW(),
+    $5
 )
-RETURNING id, url, title, content, catagory, image_url, created_at
+RETURNING id, url, title, content, catagory, image_url, created_at, published_at
 `
 
 type CreateArticleParams struct {
-	Url      string
-	Title    string
-	Content  string
-	Catagory string
+	Url         string
+	Title       string
+	Content     string
+	Catagory    string
+	PublishedAt time.Time
 }
 
 func (q *Queries) CreateArticle(ctx context.Context, arg CreateArticleParams) (Article, error) {
@@ -36,6 +39,7 @@ func (q *Queries) CreateArticle(ctx context.Context, arg CreateArticleParams) (A
 		arg.Title,
 		arg.Content,
 		arg.Catagory,
+		arg.PublishedAt,
 	)
 	var i Article
 	err := row.Scan(
@@ -46,6 +50,7 @@ func (q *Queries) CreateArticle(ctx context.Context, arg CreateArticleParams) (A
 		&i.Catagory,
 		&i.ImageUrl,
 		&i.CreatedAt,
+		&i.PublishedAt,
 	)
 	return i, err
 }
@@ -60,12 +65,13 @@ func (q *Queries) DeleteArticles(ctx context.Context) error {
 }
 
 const getOneArticle = `-- name: GetOneArticle :one
-Select id, url, title, content, catagory, image_url, created_at from articles
-where url = $1
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+order by RANDOM()
+limit 1
 `
 
-func (q *Queries) GetOneArticle(ctx context.Context, url string) (Article, error) {
-	row := q.db.QueryRowContext(ctx, getOneArticle, url)
+func (q *Queries) GetOneArticle(ctx context.Context) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getOneArticle)
 	var i Article
 	err := row.Scan(
 		&i.ID,
@@ -75,6 +81,7 @@ func (q *Queries) GetOneArticle(ctx context.Context, url string) (Article, error
 		&i.Catagory,
 		&i.ImageUrl,
 		&i.CreatedAt,
+		&i.PublishedAt,
 	)
 	return i, err
 }
