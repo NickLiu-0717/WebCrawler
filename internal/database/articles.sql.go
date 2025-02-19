@@ -87,6 +87,45 @@ func (q *Queries) GetArticleByID(ctx context.Context, id uuid.UUID) (Article, er
 	return i, err
 }
 
+const getArticlesByCategory = `-- name: GetArticlesByCategory :many
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+where catagory = $1
+order by RANDOM()
+limit 5
+`
+
+func (q *Queries) GetArticlesByCategory(ctx context.Context, catagory string) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, getArticlesByCategory, catagory)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Article
+	for rows.Next() {
+		var i Article
+		if err := rows.Scan(
+			&i.ID,
+			&i.Url,
+			&i.Title,
+			&i.Content,
+			&i.Catagory,
+			&i.ImageUrl,
+			&i.CreatedAt,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOneArticle = `-- name: GetOneArticle :one
 Select id, url, title, content, catagory, image_url, created_at, published_at from articles
 order by RANDOM()

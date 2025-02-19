@@ -41,11 +41,37 @@
         .refresh-btn:hover {
             background-color: #0056b3;
         }
+
+        .category-btn {
+            margin: 5px;
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .category-btn:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Latest News Articles</h1>
+        <div id="category-buttons">
+            <button class="category-btn" onclick="fetchArticlesByCategory('technology')">Technology</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('sports')">Sports</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('politics')">Politics</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('society')">Society</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('environment')">Environment</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('entertainment')">Entertainment</button>
+            <button class="category-btn" onclick="fetchArticlesByCategory('health')">Health</button>
+        </div>
+
+
         <div id="article-container">
             <p>Loading articles...</p>
         </div>
@@ -53,19 +79,29 @@
     </div>
 
     <script>
-        async function fetchArticles(forceRefresh = false) {
+        async function fetchArticles(category = null, forceRefresh = false) {
 
-            let articles = localStorage.getItem("articles");
+            
+            let apiUrl = "http://localhost:8080/api/articles";
 
-            if (articles && !forceRefresh) {
-                console.log("Loading articles from localStorage");
-                articles = JSON.parse(articles);
-                displayArticels(articles);
-                return;
+            if (category) {
+                apiUrl = `http://localhost:8080/api/categories/${category}/articles`;
+                forceRefresh = true;
+            }
+
+            if (!forceRefresh) {
+                let articles = localStorage.getItem("articles");
+                if (articles) {
+                    console.log("Loading articles from localStorage");
+                    articles = JSON.parse(articles);
+                    displayArticles(articles);
+                    return;
+                }
+                
             }
 
             try {
-                let response = await fetch("http://localhost:8080/api/articles");
+                let response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error("No articles available");
                 }
@@ -75,7 +111,7 @@
 
                 localStorage.setItem("articles", JSON.stringify(articles));
 
-                displayArticels(articles);
+                displayArticles(articles);
                 
             } catch (error) {
                 document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
@@ -83,7 +119,7 @@
             }
         }
 
-        function displayArticels(articles) {
+        function displayArticles(articles) {
             let container = document.getElementById("article-container");
                 container.innerHTML = ""; // Clear previous articles
                 
@@ -100,9 +136,14 @@
                 });
         }
 
+        function fetchArticlesByCategory(category) {
+            console.log(`Fetching articles for category: ${category}`);
+            fetchArticles(category);
+        }
+
         function refreshArticles() {
             console.log("Refreshing articles...")
-            fetchArticles(true); // Force fetch new articles
+            fetchArticles(null, true); // Force fetch new articles
         }
 
         //load articles when page loads

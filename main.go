@@ -142,6 +142,7 @@ func main() {
 	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
 	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
 	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.handlerGetArticleFromID)
+	mux.HandleFunc("GET /api/categories/{category}/articles", apicfg.handlerGetCategoryArticles)
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(server.ListenAndServe())

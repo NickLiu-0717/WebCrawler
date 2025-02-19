@@ -26,5 +26,15 @@ limit 5;
 Select * from articles
 where id = $1;
 
+-- name: GetArticlesByCategory :many
+Select * from articles
+where catagory = $1
+order by RANDOM()
+limit 5;
+
+-- name: GetLatestArticles :many
+Select * from articles
+order by published_at desc;
+
 -- name: DeleteArticles :exec
 Delete from articles;
