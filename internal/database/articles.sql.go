@@ -85,3 +85,41 @@ func (q *Queries) GetOneArticle(ctx context.Context) (Article, error) {
 	)
 	return i, err
 }
+
+const getRandomFiveArticle = `-- name: GetRandomFiveArticle :many
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+order by RANDOM()
+limit 5
+`
+
+func (q *Queries) GetRandomFiveArticle(ctx context.Context) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, getRandomFiveArticle)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Article
+	for rows.Next() {
+		var i Article
+		if err := rows.Scan(
+			&i.ID,
+			&i.Url,
+			&i.Title,
+			&i.Content,
+			&i.Catagory,
+			&i.ImageUrl,
+			&i.CreatedAt,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

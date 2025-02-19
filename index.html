@@ -7,44 +7,80 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Centers content horizontally */
+            align-items: center; /* Centers content vertically (optional) */
+            min-height: 80vh; /* Ensures full page height */
+            background-color: #f4f4f4;
         }
-        #article-container {
+        .article {
             border: 1px solid #ddd;
             padding: 15px;
+            margin-bottom: 10px;
+            text-align: left; /* Keeps article text aligned properly */
+        }
+        .container {
+            width: 60%; /* Adjust the width as needed */
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centers text inside */
+        }
+        .refresh-btn {
             margin-top: 20px;
-            max-width: 600px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .refresh-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>Latest News Article</h1>
-    <div id="article-container">
-        <p>Loading article...</p>
+    <div class="container">
+        <h1>Latest News Articles</h1>
+        <div id="article-container">
+            <p>Loading articles...</p>
+        </div>
+        <button class="refresh-btn" onclick="fetchArticles()">Load New Articles</button>
     </div>
 
     <script>
-        async function fetchLatestArticle() {
+        async function fetchArticles() {
             try {
                 let response = await fetch("http://localhost:8080/api/articles");
                 if (!response.ok) {
                     throw new Error("No articles available");
                 }
-                let article = await response.json();
+                let articles = await response.json();
                 
                 let container = document.getElementById("article-container");
-                container.innerHTML = `
-                    <h2>${article.title}</h2>
-                    <p>${article.content}</p>
-                    <small>Published: ${article.published_at}</small>
-                `;
+                container.innerHTML = ""; // Clear previous articles
+                
+                articles.forEach(article => {
+                    let articleDiv = document.createElement("div");
+                    articleDiv.classList.add("article");
+                    articleDiv.innerHTML = `
+                        <h3>${article.title}</h3>
+                        <p>${article.content.substring(0, 100)}...</p>
+                        <small>Published: ${article.published_at}</small>
+                    `;
+                    container.appendChild(articleDiv);
+                });
             } catch (error) {
                 document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
                 console.error("Error fetching article:", error);
             }
         }
 
-        fetchLatestArticle();
+        fetchArticles();
     </script>
 </body>
 </html>

@@ -56,7 +56,7 @@ func TestExtarctArticle(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			gottitle, gotcontent, err := extractArticles(htmlbody)
+			gottitle, gotcontent, _, err := extractArticles(htmlbody)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -17,5 +17,10 @@ Select * from articles
 order by RANDOM()
 limit 1;
 
+-- name: GetRandomFiveArticle :many
+Select * from articles
+order by RANDOM()
+limit 5;
+
 -- name: DeleteArticles :exec
 Delete from articles;
