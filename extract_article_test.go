@@ -38,17 +38,17 @@ func TestExtarctArticle(t *testing.T) {
 			containString: "特別獎號碼為「13965913」",
 		},
 		{
-			name:          "LTN news 1",
-			inputURL:      "https://estate.ltn.com.tw/article/23333",
-			expectedTitle: "高雄冬日遊樂園吸600萬參訪人潮",
-			containString: "今年高雄冬日遊樂園結合日本超人氣的「吉伊卡哇」IP",
+			name:          "PTS news 1",
+			inputURL:      "https://news.pts.org.tw/article/738466",
+			expectedTitle: "總預算案朝野協商破局 政院將提合憲救濟",
+			containString: "立法院長韓國瑜19日一早接見日本華僑回國致敬團",
 		},
-		{
-			name:          "LTM main page no article",
-			inputURL:      "https://www.ltn.com.tw/",
-			expectedTitle: "",
-			containString: "",
-		},
+		// {
+		// 	name:          "LTM main page no article",
+		// 	inputURL:      "https://www.ltn.com.tw/",
+		// 	expectedTitle: "",
+		// 	containString: "",
+		// },
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

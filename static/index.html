@@ -94,6 +94,7 @@
                         <h3><a href="/app/article.html?id=${article.id}">${article.title}</a></h3>
                         <p>${article.content.substring(0, 100)}...</p>
                         <small>Published: ${article.published_at}</small>
+                        <p><strong>Category: <span style="color: blue;">${article.catagory}</span></strong></p>
                     `;
                     container.appendChild(articleDiv);
                 });

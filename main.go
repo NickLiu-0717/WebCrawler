@@ -115,6 +115,7 @@ func main() {
 	cfg.robotGroup = group
 
 	cfg.wg.Add(1)
+	fmt.Println("Start crawling...")
 	go cfg.crawlPage(cfg.baseURL.String(), 1)
 	cfg.wg.Wait()
 

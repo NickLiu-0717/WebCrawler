@@ -6,7 +6,7 @@ VALUES (
     $2,
     $3,
     $4,
-    null,
+    Null,
     NOW(),
     $5
 )

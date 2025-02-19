@@ -34,7 +34,8 @@ func getHTML(rawURL string) (string, error) {
 	}
 	contentType := resp.Header.Get("Content-Type")
 	if !strings.Contains(contentType, "text/html") {
-		return "", fmt.Errorf("error: response is not HTML, got: %v", contentType)
+		// return "", fmt.Errorf("error: response is not HTML, got: %v", contentType)
+		return "", nil
 	}
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {

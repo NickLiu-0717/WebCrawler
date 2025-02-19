@@ -56,7 +56,7 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 	cfg.pages[norCurrentURL] = 1
 	cfg.mu.Unlock()
 
-	fmt.Printf("Start crawling %s\n", rawCurrentURL)
+	// fmt.Printf("Start crawling %s\n", rawCurrentURL)
 	//Random Sleep to simulate human behavior
 	randomSleep(1000, 2000)
 	html, err := getHTML(parsedCurrentURL.String())
@@ -75,9 +75,14 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 		// 	title:   gottitle,
 		// 	content: gotcontent,
 		// }
-		err = cfg.createArticles(norCurrentURL, gottitle, gotcontent, gotpubAt.UTC())
+		gotcatagory, err := classifyArticle(gottitle)
 		if err != nil {
-			fmt.Printf("couldn't create article to database: %v\n", err)
+			fmt.Printf("couldn't classify article by title: %v\n", err)
+			return
+		}
+		err = cfg.createArticles(norCurrentURL, gottitle, gotcontent, gotcatagory, gotpubAt.UTC())
+		if err != nil {
+			// fmt.Printf("couldn't create article to database: %v\n", err)
 			return
 		}
 		return
