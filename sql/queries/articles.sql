@@ -34,7 +34,12 @@ limit 5;
 
 -- name: GetLatestArticles :many
 Select * from articles
-order by published_at desc;
+order by published_at desc
+Limit $1 OFFSET $2;
+
+-- name: GetTotalArticleCount :one
+Select count(*)
+from articles;
 
 -- name: DeleteArticles :exec
 Delete from articles;

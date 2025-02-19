@@ -32,7 +32,7 @@
         <p id="article-content"></p>
         <small id="article-url"></small>
         <br><br>
-        <a href="index.html">Back to Homepage</a>
+        <a id="back-button" href="#">Back</a>
     </div>
 
     <script>
@@ -60,6 +60,7 @@
                 document.getElementById("article-content").innerText = article.content;
                 document.getElementById("article-date").innerText = `Published: ${article.published_at}`;
                 document.getElementById("article-url").innerText = article.url;
+                
             } catch (error) {
                 document.body.innerHTML = "<h1>Article not found.</h1>";
                 console.error("Error fetching article:", error);
@@ -67,6 +68,13 @@
         }
 
         fetchArticle();
+
+        document.getElementById("back-button").addEventListener("click", function(event) {
+            event.preventDefault(); // 阻止預設跳轉行為
+        
+            let savedPage = localStorage.getItem("currentPage") || 1;
+            window.location.href = `index.html?page=${savedPage}`;
+        });
     </script>
 </body>
 </html>

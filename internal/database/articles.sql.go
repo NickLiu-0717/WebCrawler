@@ -126,6 +126,49 @@ func (q *Queries) GetArticlesByCategory(ctx context.Context, catagory string) ([
 	return items, nil
 }
 
+const getLatestArticles = `-- name: GetLatestArticles :many
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+order by published_at desc
+Limit $1 OFFSET $2
+`
+
+type GetLatestArticlesParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetLatestArticles(ctx context.Context, arg GetLatestArticlesParams) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, getLatestArticles, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Article
+	for rows.Next() {
+		var i Article
+		if err := rows.Scan(
+			&i.ID,
+			&i.Url,
+			&i.Title,
+			&i.Content,
+			&i.Catagory,
+			&i.ImageUrl,
+			&i.CreatedAt,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOneArticle = `-- name: GetOneArticle :one
 Select id, url, title, content, catagory, image_url, created_at, published_at from articles
 order by RANDOM()
@@ -184,4 +227,16 @@ func (q *Queries) GetRandomFiveArticle(ctx context.Context) ([]Article, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getTotalArticleCount = `-- name: GetTotalArticleCount :one
+Select count(*)
+from articles
+`
+
+func (q *Queries) GetTotalArticleCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTotalArticleCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
