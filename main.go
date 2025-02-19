@@ -13,8 +13,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const defaultMaxConcurrency = 5
-const defaultMaxPages = 10
+const defaultMaxConcurrency = 75
+const defaultMaxPages = 100
 const defaultMaxDepth = 5
 
 // var newsPages []string = []string{
@@ -133,13 +133,14 @@ func main() {
 		Handler: mux,
 	}
 
-	fileServer := http.StripPrefix("/app/", http.FileServer(http.Dir("./")))
+	fileServer := http.StripPrefix("/app/", http.FileServer(http.Dir("./static")))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/app/", http.StatusFound)
 	})
 	mux.Handle("/app/", fileServer)
-	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
 	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
+	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
+	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.handlerGetArticleFromID)
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(server.ListenAndServe())

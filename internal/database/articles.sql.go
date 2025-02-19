@@ -8,6 +8,8 @@ package database
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const createArticle = `-- name: CreateArticle :one
@@ -62,6 +64,27 @@ Delete from articles
 func (q *Queries) DeleteArticles(ctx context.Context) error {
 	_, err := q.db.ExecContext(ctx, deleteArticles)
 	return err
+}
+
+const getArticleByID = `-- name: GetArticleByID :one
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+where id = $1
+`
+
+func (q *Queries) GetArticleByID(ctx context.Context, id uuid.UUID) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getArticleByID, id)
+	var i Article
+	err := row.Scan(
+		&i.ID,
+		&i.Url,
+		&i.Title,
+		&i.Content,
+		&i.Catagory,
+		&i.ImageUrl,
+		&i.CreatedAt,
+		&i.PublishedAt,
+	)
+	return i, err
 }
 
 const getOneArticle = `-- name: GetOneArticle :one

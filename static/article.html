@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 60%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="article-title">Loading...</h1>
+        <small id="article-date"></small>
+        <p id="article-content"></p>
+        <br><br>
+        <a href="index.html">Back to Homepage</a>
+    </div>
+
+    <script>
+        async function fetchArticle() {
+            // Get article ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const articleId = params.get("id");
+
+            if (!articleId) {
+                document.body.innerHTML = "<h1>Error: No article ID provided.</h1>";
+                return;
+            }
+
+            try {
+                console.log("Fetching article with ID:", articleId);
+
+                let response = await fetch(`http://localhost:8080/api/articles/${articleId}`);
+                if (!response.ok) {
+                    throw new Error("Article not found");
+                }
+                let article = await response.json();
+
+                // Update page content
+                document.getElementById("article-title").innerText = article.title;
+                document.getElementById("article-content").innerText = article.content;
+                document.getElementById("article-date").innerText = `Published: ${article.published_at}`;
+            } catch (error) {
+                document.body.innerHTML = "<h1>Article not found.</h1>";
+                console.error("Error fetching article:", error);
+            }
+        }
+
+        fetchArticle();
+    </script>
+</body>
+</html>
