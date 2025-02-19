@@ -14,28 +14,6 @@ func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
 		return nil, fmt.Errorf("couldn't parse base URL: %v", err)
 	}
 
-	// doc, err := html.Parse(strings.NewReader(htmlBody))
-	// if err != nil {
-	// 	return nil, fmt.Errorf("couldn't parse html: %v", err)
-	// }
-	// var urls []string
-	// for n := range doc.Descendants() {
-	// 	if n.Type == html.ElementNode && n.DataAtom == atom.A {			//old version, use doc.Descendants
-	// 		for _, anchor := range n.Attr {
-	// 			if anchor.Key == "href" {
-	// 				href, err := url.Parse(anchor.Val)
-	// 				if err != nil {
-	// 					fmt.Printf("couldn't parse href %v: %v\n", anchor.Val, err)
-	// 					continue
-	// 				}
-	// 				revolveURL := baseURL.ResolveReference(href)
-	// 				urls = append(urls, revolveURL.String())
-	// 				break
-	// 			}
-	// 		}
-	// 	}
-	// }
-
 	doc, err := htmlquery.Parse(strings.NewReader(htmlBody))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't parse html body: %v", err)

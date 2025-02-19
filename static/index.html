@@ -49,11 +49,21 @@
         <div id="article-container">
             <p>Loading articles...</p>
         </div>
-        <button class="refresh-btn" onclick="fetchArticles()">Load New Articles</button>
+        <button class="refresh-btn" onclick="refreshArticles()">Load New Articles</button>
     </div>
 
     <script>
-        async function fetchArticles() {
+        async function fetchArticles(forceRefresh = false) {
+
+            let articles = localStorage.getItem("articles");
+
+            if (articles && !forceRefresh) {
+                console.log("Loading articles from localStorage");
+                articles = JSON.parse(articles);
+                displayArticels(articles);
+                return;
+            }
+
             try {
                 let response = await fetch("http://localhost:8080/api/articles");
                 if (!response.ok) {
@@ -62,8 +72,19 @@
                 let articles = await response.json();
                 
                 console.log("Fetched articles:", articles);
+
+                localStorage.setItem("articles", JSON.stringify(articles));
+
+                displayArticels(articles);
                 
-                let container = document.getElementById("article-container");
+            } catch (error) {
+                document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
+                console.error("Error fetching article:", error);
+            }
+        }
+
+        function displayArticels(articles) {
+            let container = document.getElementById("article-container");
                 container.innerHTML = ""; // Clear previous articles
                 
                 articles.forEach(article => {
@@ -76,12 +97,14 @@
                     `;
                     container.appendChild(articleDiv);
                 });
-            } catch (error) {
-                document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
-                console.error("Error fetching article:", error);
-            }
         }
 
+        function refreshArticles() {
+            console.log("Refreshing articles...")
+            fetchArticles(true); // Force fetch new articles
+        }
+
+        //load articles when page loads
         fetchArticles();
     </script>
 </body>

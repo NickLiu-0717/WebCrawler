@@ -30,6 +30,7 @@
         <h1 id="article-title">Loading...</h1>
         <small id="article-date"></small>
         <p id="article-content"></p>
+        <small id="article-url"></small>
         <br><br>
         <a href="index.html">Back to Homepage</a>
     </div>
@@ -58,6 +59,7 @@
                 document.getElementById("article-title").innerText = article.title;
                 document.getElementById("article-content").innerText = article.content;
                 document.getElementById("article-date").innerText = `Published: ${article.published_at}`;
+                document.getElementById("article-url").innerText = article.url;
             } catch (error) {
                 document.body.innerHTML = "<h1>Article not found.</h1>";
                 console.error("Error fetching article:", error);

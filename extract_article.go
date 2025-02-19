@@ -69,27 +69,19 @@ func extractArticles(htmlbody string) (string, string, time.Time, error) {
 }
 
 func extractPublishedTime(doc *html.Node) string {
-	xpathQueries1 := []string{
+	xpathQueries := []string{
 		"//meta[@property='article:published_time']/@content", // OpenGraph metadata
 		"//meta[@name='datePublished']/@content",              // Schema.org metadata
 		"//meta[@name='publish_date']/@content",               // Custom metadata
 		"//meta[@name='date']/@content",                       // Generic date metadata
+		"//time/@datetime",                                    // <time> tag with datetime attribute
+		"//time/text()",                                       // <time> tag text content
+		"//*[contains(@class, 'date')]/text()",                // Generic class containing "date"
+		"//*[contains(@class, 'published')]/text()",           // Class containing "published"
+		"//*[contains(@class, 'post-date')]/text()",           // Class containing "post-date"
+		"//*[contains(@class, 'timestamp')]/text()",           // Class containing "timestamp"
 	}
-	xpathQueries2 := []string{
-		"//time/@datetime",                          // <time> tag with datetime attribute
-		"//time/text()",                             // <time> tag text content
-		"//*[contains(@class, 'date')]/text()",      // Generic class containing "date"
-		"//*[contains(@class, 'published')]/text()", // Class containing "published"
-		"//*[contains(@class, 'post-date')]/text()", // Class containing "post-date"
-		"//*[contains(@class, 'timestamp')]/text()", // Class containing "timestamp"
-	}
-	for _, query := range xpathQueries1 {
-		node := htmlquery.FindOne(doc, query)
-		if node != nil {
-			return htmlquery.SelectAttr(node, "content")
-		}
-	}
-	for _, query := range xpathQueries2 {
+	for _, query := range xpathQueries {
 		node := htmlquery.FindOne(doc, query)
 		if node != nil {
 			return htmlquery.InnerText(node)
