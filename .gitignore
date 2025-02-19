@@ -1,2 +1,7 @@
 crawler
 .env
+# 忽略 Python venv
+classifier/venv/
+classifier/__pycache__/
+classifier/*.pyc
+classifier/*.pyo
