@@ -21,3 +21,11 @@ type Article struct {
 	CreatedAt   time.Time
 	PublishedAt time.Time
 }
+
+type User struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Email     string
+	Password  string
+}
