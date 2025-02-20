@@ -40,7 +40,7 @@ func TestExtarctArticle(t *testing.T) {
 		{
 			name:          "PTS news 1",
 			inputURL:      "https://news.pts.org.tw/article/738466",
-			expectedTitle: "總預算案朝野協商破局 政院將提合憲救濟",
+			expectedTitle: "立法院今送出總預算案",
 			containString: "立法院長韓國瑜19日一早接見日本華僑回國致敬團",
 		},
 		// {

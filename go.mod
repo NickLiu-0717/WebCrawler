@@ -17,6 +17,7 @@ require (
 require (
 	github.com/antchfx/xpath v1.3.3 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/text v0.22.0 // indirect

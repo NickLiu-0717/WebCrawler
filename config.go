@@ -28,6 +28,19 @@ type Article struct {
 	Published_at time.Time `json:"published_at"`
 }
 
+type User struct {
+	ID         uuid.UUID `json:"id"`
+	Created_at time.Time `json:"created_at"`
+	Updated_at time.Time `json:"updated_at"`
+	Email      string    `json:"email"`
+	Password   string    `json:"password"`
+}
+
+type UserInfo struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type apiConfig struct {
 	db         *database.Queries
 	port       string

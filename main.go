@@ -147,6 +147,8 @@ func main() {
 	})
 	mux.Handle("/app/", fileServer)
 	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
+	mux.HandleFunc("POST /api/signup", apicfg.handlerSignup)
+	mux.HandleFunc("POST /api/login", apicfg.handlerLogin)
 	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
 	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.handlerGetArticleFromID)
 	mux.HandleFunc("GET /api/categories/{category}/articles", apicfg.handlerGetCategoryArticles)
