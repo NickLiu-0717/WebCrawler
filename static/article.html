@@ -73,7 +73,14 @@
             event.preventDefault(); // 阻止預設跳轉行為
         
             let savedPage = localStorage.getItem("currentPage") || 1;
-            window.location.href = `index.html?page=${savedPage}`;
+            let savedCategory = localStorage.getItem("currentCategory");
+
+            if (savedCategory) {
+                window.location.href = `index.html?page=${savedPage}&category=${savedCategory}`;
+            } else {
+                window.location.href = `index.html?page=${savedPage}`;
+            }
+            
         });
     </script>
 </body>

@@ -93,6 +93,7 @@
             <button class="category-btn" onclick="fetchArticlesByCategory('health')">Health</button>
         </div>
 
+        <h2 id="current-category">All Categories</h2>
 
         <div id="article-container">
             <p>Loading articles...</p>
@@ -103,12 +104,12 @@
             <span id="page-info">Page 1</span>
             <button id="next-page" onclick="changePage(1)">Next</button>
         </div>
-        <button class="home-page" onclick="fetchArticles(null, 1, false)">Home Page</button>
+        <button class="home-page" onclick="resetHomePage()">Home Page</button>
         
     </div>
 
     <script>
-
+        let currentCategory = null
         let currentPage = 1;
         let pageSize = 5;
 
@@ -117,7 +118,7 @@
             let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
 
             if (category) {
-                apiUrl = `http://localhost:8080/api/categories/${category}/articles`;
+                apiUrl = `http://localhost:8080/api/categories/${category}/articles?page=${page}&limit=${pageSize}`;
                 forceRefresh = true;
             }
 
@@ -171,14 +172,23 @@
         }
 
         function fetchArticlesByCategory(category) {
+            if (currentCategory === category) {
+                currentPage = localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1;
+            } else {
+                currentPage = 1; // 新選擇分類時，從第一頁開始
+            }
+
+            currentCategory = category;
+            localStorage.setItem("currentCategory", currentCategory);
+            localStorage.setItem("currentPage", currentPage);
             console.log(`Fetching articles for category: ${category}`);
-            fetchArticles(category);
+            fetchArticles(currentCategory, currentPage);
         }
         
         function changePage(offset) {
             let newPage = currentPage + offset;
             if (newPage < 1) return; // 確保頁數不會低於 1
-            fetchArticles(null, newPage, false);
+            fetchArticles(currentCategory, newPage, false);
         }
 
         function updatePagination() {
@@ -188,11 +198,25 @@
             document.getElementById("prev-page").disabled = (currentPage === 1);
         }
         
+        function resetHomePage() {
+            currentCategory = null
+            document.getElementById("current-category").innerText = "All Categories";
+            fetchArticles(currentCategory, 1, false)
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             let params = new URLSearchParams(window.location.search);
             let pageFromURL = params.get("page");
-    
-            if (pageFromURL) {
+            let categoryFromURL = params.get("category");
+            
+            if (categoryFromURL) {
+                currentCategory = categoryFromURL;
+                currentPage = pageFromURL ? parseInt(pageFromURL) : (localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1);
+                localStorage.setItem("currentCategory", currentCategory);
+                localStorage.setItem("currentPage", currentPage);
+                fetchArticlesByCategory(currentCategory);
+
+            } else if (pageFromURL) {
                 fetchArticles(null, parseInt(pageFromURL));
             } else {
                 let savedPage = localStorage.getItem("currentPage");

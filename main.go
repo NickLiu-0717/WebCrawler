@@ -22,7 +22,6 @@ const defaultMaxDepth = 5
 // 	"https://edition.cnn.com/",
 // 	"https://www.forbes.com/",
 // 	"https://news.ebc.net.tw",
-// 	"https://news.ltn.com.tw",
 // 	"https://news.pts.org.tw/",
 // }
 
@@ -114,19 +113,27 @@ func main() {
 	}
 	cfg.robotGroup = group
 
-	cfg.wg.Add(1)
-	fmt.Println("Start crawling...")
-	go cfg.crawlPage(cfg.baseURL.String(), 1)
-	cfg.wg.Wait()
+	apicfg := apiConfig{
+		db:   dbQueries,
+		port: port,
+	}
+	totalPages, err := apicfg.getTotalPages(5)
+	if err != nil {
+		fmt.Printf("Error getting total pages: %v", err)
+	}
+	apicfg.totalPages = totalPages
+
+	if apicfg.totalPages < 3 {
+		cfg.wg.Add(1)
+		fmt.Println("Start crawling...")
+		go cfg.crawlPage(cfg.baseURL.String(), 1)
+		cfg.wg.Wait()
+	}
 
 	// printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
 	// for key, article := range cfg.articles {
 	// 	fmt.Printf("From: %s, Title: %s\n", key, article.title)
 	// }
-	apicfg := apiConfig{
-		db:   dbQueries,
-		port: port,
-	}
 
 	mux := http.NewServeMux()
 	server := &http.Server{

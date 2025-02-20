@@ -37,6 +37,12 @@ Select * from articles
 order by published_at desc
 Limit $1 OFFSET $2;
 
+-- name: GetLatestCategoryArticles :many
+Select * from articles
+where catagory = $1
+order by published_at desc
+Limit $2 OFFSET $3;
+
 -- name: GetTotalArticleCount :one
 Select count(*)
 from articles;

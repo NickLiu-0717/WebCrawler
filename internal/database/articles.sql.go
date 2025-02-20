@@ -169,6 +169,51 @@ func (q *Queries) GetLatestArticles(ctx context.Context, arg GetLatestArticlesPa
 	return items, nil
 }
 
+const getLatestCategoryArticles = `-- name: GetLatestCategoryArticles :many
+Select id, url, title, content, catagory, image_url, created_at, published_at from articles
+where catagory = $1
+order by published_at desc
+Limit $2 OFFSET $3
+`
+
+type GetLatestCategoryArticlesParams struct {
+	Catagory string
+	Limit    int32
+	Offset   int32
+}
+
+func (q *Queries) GetLatestCategoryArticles(ctx context.Context, arg GetLatestCategoryArticlesParams) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, getLatestCategoryArticles, arg.Catagory, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Article
+	for rows.Next() {
+		var i Article
+		if err := rows.Scan(
+			&i.ID,
+			&i.Url,
+			&i.Title,
+			&i.Content,
+			&i.Catagory,
+			&i.ImageUrl,
+			&i.CreatedAt,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOneArticle = `-- name: GetOneArticle :one
 Select id, url, title, content, catagory, image_url, created_at, published_at from articles
 order by RANDOM()
