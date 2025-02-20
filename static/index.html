@@ -30,7 +30,7 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center; /* Centers text inside */
         }
-        .refresh-btn {
+        .home-page {
             margin-top: 20px;
             padding: 10px;
             background-color: #007BFF;
@@ -38,7 +38,7 @@
             border: none;
             cursor: pointer;
         }
-        .refresh-btn:hover {
+        .home-page {
             background-color: #0056b3;
         }
 
@@ -56,6 +56,28 @@
             background-color: #218838;
         }
 
+        #pagination-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #pagination-controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #pagination-controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
     </style>
 </head>
 <body>
@@ -71,30 +93,40 @@
             <button class="category-btn" onclick="fetchArticlesByCategory('health')">Health</button>
         </div>
 
+        <h2 id="current-category">All Categories</h2>
 
         <div id="article-container">
             <p>Loading articles...</p>
         </div>
-        <button class="refresh-btn" onclick="refreshArticles()">Load New Articles</button>
+
+        <div id="pagination-controls">
+            <button id="prev-page" onclick="changePage(-1)">Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-page" onclick="changePage(1)">Next</button>
+        </div>
+        <button class="home-page" onclick="resetHomePage()">Home Page</button>
+        
     </div>
 
     <script>
-        async function fetchArticles(category = null, forceRefresh = false) {
+        let currentCategory = null
+        let currentPage = 1;
+        let pageSize = 5;
 
-            
-            let apiUrl = "http://localhost:8080/api/articles";
+        async function fetchArticles(category = null, page = 1, forceRefresh = false) {
+
+            let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
 
             if (category) {
-                apiUrl = `http://localhost:8080/api/categories/${category}/articles`;
+                apiUrl = `http://localhost:8080/api/categories/${category}/articles?page=${page}&limit=${pageSize}`;
                 forceRefresh = true;
             }
 
             if (!forceRefresh) {
-                let articles = localStorage.getItem("articles");
-                if (articles) {
-                    console.log("Loading articles from localStorage");
-                    articles = JSON.parse(articles);
-                    displayArticles(articles);
+                let cachedArticles = localStorage.getItem(`articles_page_${page}`);
+                if (cachedArticles) {
+                    console.log(`Loading articles from localStorage (Page ${page})`);
+                    displayArticles(JSON.parse(cachedArticles));
                     return;
                 }
                 
@@ -107,11 +139,14 @@
                 }
                 let articles = await response.json();
                 
-                console.log("Fetched articles:", articles);
+                console.log("Fetched articles (Page ${page}:", articles);
 
-                localStorage.setItem("articles", JSON.stringify(articles));
+                localStorage.setItem("articles_page_${page}", JSON.stringify(articles));
 
                 displayArticles(articles);
+                currentPage = page;
+                localStorage.setItem("currentPage", currentPage);
+                updatePagination();
                 
             } catch (error) {
                 document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
@@ -137,14 +172,57 @@
         }
 
         function fetchArticlesByCategory(category) {
+            if (currentCategory === category) {
+                currentPage = localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1;
+            } else {
+                currentPage = 1; // 新選擇分類時，從第一頁開始
+            }
+
+            currentCategory = category;
+            localStorage.setItem("currentCategory", currentCategory);
+            localStorage.setItem("currentPage", currentPage);
             console.log(`Fetching articles for category: ${category}`);
-            fetchArticles(category);
+            fetchArticles(currentCategory, currentPage);
+        }
+        
+        function changePage(offset) {
+            let newPage = currentPage + offset;
+            if (newPage < 1) return; // 確保頁數不會低於 1
+            fetchArticles(currentCategory, newPage, false);
         }
 
-        function refreshArticles() {
-            console.log("Refreshing articles...")
-            fetchArticles(null, true); // Force fetch new articles
+        function updatePagination() {
+            document.getElementById("page-info").innerText = `Page ${currentPage}`;
+            
+            // 禁用 "上一頁" 按鈕（如果在第 1 頁）
+            document.getElementById("prev-page").disabled = (currentPage === 1);
         }
+        
+        function resetHomePage() {
+            currentCategory = null
+            document.getElementById("current-category").innerText = "All Categories";
+            fetchArticles(currentCategory, 1, false)
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let params = new URLSearchParams(window.location.search);
+            let pageFromURL = params.get("page");
+            let categoryFromURL = params.get("category");
+            
+            if (categoryFromURL) {
+                currentCategory = categoryFromURL;
+                currentPage = pageFromURL ? parseInt(pageFromURL) : (localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1);
+                localStorage.setItem("currentCategory", currentCategory);
+                localStorage.setItem("currentPage", currentPage);
+                fetchArticlesByCategory(currentCategory);
+
+            } else if (pageFromURL) {
+                fetchArticles(null, parseInt(pageFromURL));
+            } else {
+                let savedPage = localStorage.getItem("currentPage");
+                fetchArticles(null, savedPage ? parseInt(savedPage) : 1);
+            }
+        });
 
         //load articles when page loads
         fetchArticles();

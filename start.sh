@@ -19,7 +19,7 @@ for ((i=1; i<=MAX_RETRIES; i++)); do
                     --request POST --data "$TEST_JSON" "$API_URL" | jq -r '.catagory')
     
     if [[ "$response" != "null" && "$response" != "" ]]; then
-        echo "✅ API 已準備就緒！分類結果: $response"
+        echo "✅ API 已準備就緒！"
         break
     fi
 

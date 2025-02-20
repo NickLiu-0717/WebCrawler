@@ -29,8 +29,9 @@ type Article struct {
 }
 
 type apiConfig struct {
-	db   *database.Queries
-	port string
+	db         *database.Queries
+	port       string
+	totalPages int
 }
 
 type config struct {
