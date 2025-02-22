@@ -128,7 +128,7 @@ func main() {
 	}
 	apicfg.totalPages = totalPages
 
-	if apicfg.totalPages < 100 {
+	if apicfg.totalPages < 10 {
 		cfg.wg.Add(1)
 		fmt.Println("Start crawling...")
 		go cfg.crawlPage(cfg.baseURL.String(), 1)

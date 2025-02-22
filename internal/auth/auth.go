@@ -27,7 +27,7 @@ func GetBearerToken(header http.Header) (string, error) {
 	if authHeader == "" {
 		return "", fmt.Errorf("no authorization header found")
 	}
-	return strings.TrimPrefix(authHeader, "Bearer"), nil
+	return strings.TrimPrefix(authHeader, "Bearer "), nil
 }
 
 func GetAPIKey(header http.Header) (string, error) {
