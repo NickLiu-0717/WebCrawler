@@ -43,6 +43,10 @@ func main() {
 	if port == "" {
 		log.Fatal("PORT must be set")
 	}
+	secretKey := os.Getenv("SECRET_KEY")
+	if secretKey == "" {
+		log.Fatal("secretKey must be set")
+	}
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Printf("Error opening database: %s", err)
@@ -114,8 +118,9 @@ func main() {
 	cfg.robotGroup = group
 
 	apicfg := apiConfig{
-		db:   dbQueries,
-		port: port,
+		db:        dbQueries,
+		port:      port,
+		secretKey: secretKey,
 	}
 	totalPages, err := apicfg.getTotalPages(5)
 	if err != nil {
@@ -123,7 +128,7 @@ func main() {
 	}
 	apicfg.totalPages = totalPages
 
-	if apicfg.totalPages < 3 {
+	if apicfg.totalPages < 100 {
 		cfg.wg.Add(1)
 		fmt.Println("Start crawling...")
 		go cfg.crawlPage(cfg.baseURL.String(), 1)
@@ -149,6 +154,8 @@ func main() {
 	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
 	mux.HandleFunc("POST /api/signup", apicfg.handlerSignup)
 	mux.HandleFunc("POST /api/login", apicfg.handlerLogin)
+	mux.HandleFunc("POST /api/refresh", apicfg.handlerRefresh)
+	mux.HandleFunc("POST /api/revoke", apicfg.handlerRevoke)
 	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
 	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.handlerGetArticleFromID)
 	mux.HandleFunc("GET /api/categories/{category}/articles", apicfg.handlerGetCategoryArticles)

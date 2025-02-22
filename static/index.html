@@ -113,7 +113,7 @@
         let currentPage = 1;
         let pageSize = 5;
 
-        async function fetchArticles(category = null, page = 1, forceRefresh = false) {
+        async function fetchArticles(category = null, page = 1, forceRefresh = true) {
 
             let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
 
@@ -139,9 +139,9 @@
                 }
                 let articles = await response.json();
                 
-                console.log("Fetched articles (Page ${page}:", articles);
+                console.log(`Fetched articles (Page ${page}:`, articles);
 
-                localStorage.setItem("articles_page_${page}", JSON.stringify(articles));
+                localStorage.setItem(`articles_page_${page}`, JSON.stringify(articles));
 
                 displayArticles(articles);
                 currentPage = page;
@@ -179,16 +179,22 @@
             }
 
             currentCategory = category;
+            document.getElementById("current-category").innerText = category.charAt(0).toUpperCase() + category.slice(1);
+
             localStorage.setItem("currentCategory", currentCategory);
             localStorage.setItem("currentPage", currentPage);
             console.log(`Fetching articles for category: ${category}`);
-            fetchArticles(currentCategory, currentPage);
+            fetchArticles(currentCategory, currentPage, true);
         }
         
         function changePage(offset) {
             let newPage = currentPage + offset;
             if (newPage < 1) return; // 確保頁數不會低於 1
-            fetchArticles(currentCategory, newPage, false);
+
+            currentPage = newPage; // 立即更新
+            localStorage.setItem("currentPage", currentPage);
+            document.getElementById("page-info").innerText = `Page ${currentPage}`;
+            fetchArticles(currentCategory, newPage, true);
         }
 
         function updatePagination() {
@@ -199,9 +205,10 @@
         }
         
         function resetHomePage() {
-            currentCategory = null
+            currentCategory = null;
+            localStorage.setItem("currentCategory", currentCategory);
             document.getElementById("current-category").innerText = "All Categories";
-            fetchArticles(currentCategory, 1, false)
+            fetchArticles(currentCategory, 1, true)
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -217,10 +224,12 @@
                 fetchArticlesByCategory(currentCategory);
 
             } else if (pageFromURL) {
-                fetchArticles(null, parseInt(pageFromURL));
+                fetchArticles(null, parseInt(pageFromURL), true);
             } else {
-                let savedPage = localStorage.getItem("currentPage");
-                fetchArticles(null, savedPage ? parseInt(savedPage) : 1);
+                // currentPage = 1;
+                // localStorage.setItem("currentPage", currentPage);
+                currentPage = localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1;
+                fetchArticles(null, currentPage, true);
             }
         });
 

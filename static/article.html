@@ -75,7 +75,7 @@
             let savedPage = localStorage.getItem("currentPage") || 1;
             let savedCategory = localStorage.getItem("currentCategory");
 
-            if (savedCategory) {
+            if (savedCategory && savedCategory !== "null" && savedCategory !== "") {
                 window.location.href = `index.html?page=${savedPage}&category=${savedCategory}`;
             } else {
                 window.location.href = `index.html?page=${savedPage}`;

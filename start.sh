@@ -1,8 +1,56 @@
 #!/bin/bash
+
+# 檢查是否已安裝 PostgreSQL
+# if ! command -v psql &> /dev/null; then
+#     echo "🚨 PostgreSQL 未安裝，正在安裝..."
+    
+#     # 根據作業系統安裝 PostgreSQL
+#     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+#         sudo apt update
+#         sudo apt install -y postgresql postgresql-contrib
+#     elif [[ "$OSTYPE" == "darwin"* ]]; then
+#         brew install postgresql
+#     else
+#         echo "❌ 無法自動安裝 PostgreSQL，請手動安裝！"
+#         exit 1
+#     fi
+# fi
+
+# 確保 PostgreSQL 服務正在運行
+# if ! pg_isready -q; then
+#     echo "🔄 啟動 PostgreSQL 服務..."
+#     sudo service postgresql start
+# fi
+
+# 等待 PostgreSQL 完全啟動
+# sleep 2
+
+# 設定資料庫名稱與使用者
+DB_NAME="crawler"
+DB_USER="postgres"
+DB_PASS="postgres"
+
+# 檢查資料庫是否存在
+# DB_EXIST=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'")
+
+# if [[ "$DB_EXIST" != "1" ]]; then
+#     echo "📦 建立資料庫 $DB_NAME..."
+#     sudo -u postgres psql <<EOF
+# CREATE DATABASE $DB_NAME;
+# CREATE USER $DB_USER postgres PASSWORD '$DB_PASS';
+# EOF
+# else
+#     echo "✅ 資料庫 $DB_NAME 已存在，跳過建立步驟。"
+# fi
+
+# cd sql/schema
+# goose postgres "postgres://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME" up
+# cd ../..
+
 # 啟動 Python API
 echo "🚀 啟動 Python API..."
 cd classifier
-# pip install -r requirements.txt
+# python3 -m pip install -r requirements.txt
 nohup python3 classifier_api.py > classifier.log 2>&1 &
 cd ..
 
@@ -35,6 +83,6 @@ fi
 
 # 啟動 Go Web Crawler
 echo "🚀 啟動 Go Web Crawler..."
-go run . "https://news.pts.org.tw/" 150 100 3
+go run . "https://www.bbc.com/" 150 100 3
 
 

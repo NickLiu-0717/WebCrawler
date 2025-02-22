@@ -29,11 +29,12 @@ type Article struct {
 }
 
 type User struct {
-	ID         uuid.UUID `json:"id"`
-	Created_at time.Time `json:"created_at"`
-	Updated_at time.Time `json:"updated_at"`
-	Email      string    `json:"email"`
-	Password   string    `json:"password"`
+	ID           uuid.UUID `json:"id"`
+	Created_at   time.Time `json:"created_at"`
+	Updated_at   time.Time `json:"updated_at"`
+	Email        string    `json:"email"`
+	Token        string    `json:"token"`
+	RefreshToken string    `json:"refresh_token"`
 }
 
 type UserInfo struct {
@@ -45,6 +46,7 @@ type apiConfig struct {
 	db         *database.Queries
 	port       string
 	totalPages int
+	secretKey  string
 }
 
 type config struct {
