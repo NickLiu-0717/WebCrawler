@@ -5,10 +5,23 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/NickLiu-0717/crawler/internal/auth"
 	"github.com/NickLiu-0717/crawler/internal/database"
 )
 
 func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Request) {
+
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "no authorization header found", err)
+		return
+	}
+
+	_, err = auth.ValidateJWT(token, apicfg.secretKey)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "invalid or expired access token", err)
+		return
+	}
 
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
@@ -64,6 +77,6 @@ func (apicfg *apiConfig) getTotalPages(limit int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	totalPages := (int(totalCount) + limit - 1) / limit // 計算總頁數
+	totalPages := (int(totalCount) + limit - 1) / limit
 	return totalPages, nil
 }

@@ -10,87 +10,65 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center; /* Centers content horizontally */
-            align-items: center; /* Centers content vertically (optional) */
-            min-height: 80vh; /* Ensures full page height */
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
             background-color: #f4f4f4;
         }
-        .article {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: left; /* Keeps article text aligned properly */
-        }
         .container {
-            width: 60%; /* Adjust the width as needed */
+            width: 60%;
             max-width: 800px;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center; /* Centers text inside */
+            text-align: center;
         }
-        .home-page {
-            margin-top: 20px;
-            padding: 10px;
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .button {
+            margin: 5px;
+            padding: 8px 12px;
             background-color: #007BFF;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
         }
-        .home-page {
+        .button:hover {
             background-color: #0056b3;
         }
-
-        .category-btn {
-            margin: 5px;
-            padding: 8px 12px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .category-btn:hover {
-            background-color: #218838;
-        }
-
-        #pagination-controls {
-            margin-top: 20px;
+        .auth-buttons {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
-
-        #pagination-controls button {
-            margin: 5px;
-            padding: 8px 12px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #pagination-controls button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 登入 / 註冊 / 登出 -->
+        <div class="auth-buttons">
+            <button class="button" onclick="window.location.href='signup.html'" id="signup-btn">Sign Up</button>
+            <button class="button" onclick="window.location.href='login.html'" id="login-btn">Login</button>
+            <button class="button" id="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+        </div>
+
         <h1>Latest News Articles</h1>
+
+        <!-- 分類按鈕 -->
         <div id="category-buttons">
-            <button class="category-btn" onclick="fetchArticlesByCategory('technology')">Technology</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('sports')">Sports</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('politics')">Politics</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('society')">Society</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('environment')">Environment</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('entertainment')">Entertainment</button>
-            <button class="category-btn" onclick="fetchArticlesByCategory('health')">Health</button>
+            <button class="button" onclick="fetchArticlesByCategory('technology')">Technology</button>
+            <button class="button" onclick="fetchArticlesByCategory('sports')">Sports</button>
+            <button class="button" onclick="fetchArticlesByCategory('politics')">Politics</button>
+            <button class="button" onclick="fetchArticlesByCategory('society')">Society</button>
+            <button class="button" onclick="fetchArticlesByCategory('environment')">Environment</button>
+            <button class="button" onclick="fetchArticlesByCategory('entertainment')">Entertainment</button>
+            <button class="button" onclick="fetchArticlesByCategory('health')">Health</button>
         </div>
 
         <h2 id="current-category">All Categories</h2>
@@ -99,21 +77,59 @@
             <p>Loading articles...</p>
         </div>
 
+        <!-- 分頁控制 -->
         <div id="pagination-controls">
             <button id="prev-page" onclick="changePage(-1)">Previous</button>
             <span id="page-info">Page 1</span>
             <button id="next-page" onclick="changePage(1)">Next</button>
         </div>
-        <button class="home-page" onclick="resetHomePage()">Home Page</button>
         
+        <button class="button" onclick="resetHomePage()">Home Page</button>
     </div>
 
     <script>
-        let currentCategory = null
+        let currentCategory = null;
         let currentPage = 1;
         let pageSize = 5;
 
+        // async function fetchArticles(category = null, page = 1) {
+        //     let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
+        //     if (category) {
+        //         apiUrl = `http://localhost:8080/api/categories/${category}/articles?page=${page}&limit=${pageSize}`;
+        //     }
+
+        //     try {
+                // let token = localStorage.getItem("token");
+                // let response = await fetch(apiUrl, {
+                //     headers: token ? { "Authorization": `Bearer ${token}` } : {}
+                // });
+
+                // if (!response.ok) {
+                //     if (response.status === 401) {
+                //         await refreshToken();
+                //         return fetchArticles(category, page);
+                //     }
+                //     throw new Error("Failed to fetch articles");
+                // }
+
+        //         let articles = await response.json();
+        //         displayArticles(articles);
+        //         currentPage = page;
+        //         updatePagination();
+        //     } catch (error) {
+        //         document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
+        //         console.error("Error fetching articles:", error);
+        //     }
+        // }
+
         async function fetchArticles(category = null, page = 1, forceRefresh = true) {
+
+            let token = localStorage.getItem("token");
+            if (!token || token === "null" || token === "undefined") {
+                console.warn("No valid token found. Asking user to log in.");
+                document.getElementById("article-container").innerHTML = "<p>Please sign up or log in to view articles.</p>";
+                return;
+            }
 
             let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
 
@@ -133,10 +149,27 @@
             }
 
             try {
-                let response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error("No articles available");
+                let token = localStorage.getItem("token");
+                let response = await fetch(apiUrl, {
+                    headers: token ? { "Authorization": `Bearer ${token}` } : {}
+                });
+
+                if (response.status === 401) {
+                    console.warn("JWT token expired, trying to refresh...");
+                    let newToken = await refreshToken();
+                    if (newToken) {
+                        return fetchArticles(category, page, true); // 用新 token 再次嘗試
+                    } else {
+                        console.error("Failed to refresh token. Please log in again.");
+                        logout();
+                        return;
+                    }
                 }
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch articles");
+                }
+
                 let articles = await response.json();
                 
                 console.log(`Fetched articles (Page ${page}:`, articles);
@@ -152,7 +185,7 @@
                 document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
                 console.error("Error fetching article:", error);
             }
-        }
+            }
 
         function displayArticles(articles) {
             let container = document.getElementById("article-container");
@@ -171,7 +204,7 @@
                 });
         }
 
-        function fetchArticlesByCategory(category) {
+        function fetchArticlesByCategory(category) {    
             if (currentCategory === category) {
                 currentPage = localStorage.getItem("currentPage") ? parseInt(localStorage.getItem("currentPage")) : 1;
             } else {
@@ -186,24 +219,18 @@
             console.log(`Fetching articles for category: ${category}`);
             fetchArticles(currentCategory, currentPage, true);
         }
-        
+
         function changePage(offset) {
             let newPage = currentPage + offset;
-            if (newPage < 1) return; // 確保頁數不會低於 1
-
-            currentPage = newPage; // 立即更新
-            localStorage.setItem("currentPage", currentPage);
-            document.getElementById("page-info").innerText = `Page ${currentPage}`;
-            fetchArticles(currentCategory, newPage, true);
+            if (newPage < 1) return;
+            fetchArticles(currentCategory, newPage);
         }
 
         function updatePagination() {
             document.getElementById("page-info").innerText = `Page ${currentPage}`;
-            
-            // 禁用 "上一頁" 按鈕（如果在第 1 頁）
             document.getElementById("prev-page").disabled = (currentPage === 1);
         }
-        
+
         function resetHomePage() {
             currentCategory = null;
             localStorage.setItem("currentCategory", currentCategory);
@@ -211,7 +238,62 @@
             fetchArticles(currentCategory, 1, true)
         }
 
+        async function refreshToken() {
+            let refreshToken = localStorage.getItem("refreshToken");
+            // if (!refreshToken) return logout();
+            if (!refreshToken) {
+                console.warn("No refresh token found.");
+                return null; // 不馬上登出
+            }
+
+            try {
+                let response = await fetch("http://localhost:8080/api/refresh", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (!response.ok) throw new Error("Refresh token expired");
+
+                let data = await response.json();
+                localStorage.setItem("token", data.Token);
+                return data.Token;
+            } catch {
+                logout();
+            }
+        }
+
+        function logout() {
+            let refreshToken = localStorage.getItem("refreshToken");
+            if (refreshToken) {
+                fetch("http://localhost:8080/api/revoke", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refreshToken })
+                }).then(() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("refreshToken");
+                    alert("Logged out successfully.");
+                    window.location.reload();
+                });
+            } else {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                window.location.reload();
+            }
+        }
+
+        function checkAuthStatus() {
+            let token = localStorage.getItem("token");  
+            if (token) {
+                document.getElementById("signup-btn").style.display = "none";
+                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("logout-btn").style.display = "block";
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
+            checkAuthStatus();
             let params = new URLSearchParams(window.location.search);
             let pageFromURL = params.get("page");
             let categoryFromURL = params.get("category");
@@ -232,9 +314,6 @@
                 fetchArticles(null, currentPage, true);
             }
         });
-
-        //load articles when page loads
-        fetchArticles();
     </script>
 </body>
 </html>
