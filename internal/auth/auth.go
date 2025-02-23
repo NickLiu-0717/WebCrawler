@@ -35,7 +35,7 @@ func GetAPIKey(header http.Header) (string, error) {
 	if authHeader == "" {
 		return "", fmt.Errorf("no authorization header found")
 	}
-	return strings.TrimPrefix(authHeader, "APIKey"), nil
+	return strings.TrimPrefix(authHeader, "APIKey "), nil
 }
 
 func MakeRefreshToken() (string, error) {

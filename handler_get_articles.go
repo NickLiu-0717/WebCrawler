@@ -77,6 +77,6 @@ func (apicfg *apiConfig) getTotalPages(limit int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	totalPages := (int(totalCount) + limit - 1) / limit // 計算總頁數
+	totalPages := (int(totalCount) + limit - 1) / limit
 	return totalPages, nil
 }
