@@ -285,12 +285,17 @@
 
         function checkAuthStatus() {
             let token = localStorage.getItem("token");  
-            if (token) {
+            if (token && token !== "null" && token !== "undefined") {
                 document.getElementById("signup-btn").style.display = "none";
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "block";
+            } else {
+                document.getElementById("signup-btn").style.display = "block";
+                document.getElementById("login-btn").style.display = "block";
+                document.getElementById("logout-btn").style.display = "none";
             }
         }
+        
 
         document.addEventListener("DOMContentLoaded", () => {
             checkAuthStatus();
