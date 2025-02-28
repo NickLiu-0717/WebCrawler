@@ -8,7 +8,11 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/NickLiu-0717/crawler/config"
+	"github.com/NickLiu-0717/crawler/crawl"
+	"github.com/NickLiu-0717/crawler/handler"
 	database "github.com/NickLiu-0717/crawler/internal/database"
+	"github.com/NickLiu-0717/crawler/service"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -103,36 +107,38 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg, err := configure(cmdArg[1], maxConcurrency, maxPages, maxDepth)
+	conf, err := config.Configure(cmdArg[1], maxConcurrency, maxPages, maxDepth)
 	if err != nil {
 		fmt.Printf("Error - couldn't configure: %v\n", err)
 		return
 	}
-	cfg.db = dbQueries
+	cfg := crawl.CrawlConfig{Config: conf}
+	cfg.Config.Db = dbQueries
 
-	group, err := checkRobotsTxt(cfg.baseURL.String())
+	group, err := service.CheckRobotsTxt(cfg.Config.BaseURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't check robots.txt: %v\n", err)
 		return
 	}
-	cfg.robotGroup = group
+	cfg.Config.RobotGroup = group
 
-	apicfg := apiConfig{
-		db:        dbQueries,
-		port:      port,
-		secretKey: secretKey,
+	apiConfig := &config.ApiConfig{
+		Db:        dbQueries,
+		Port:      port,
+		SecretKey: secretKey,
 	}
-	totalPages, err := apicfg.getTotalPages(5)
+	apicfg := handler.Handler{Config: apiConfig}
+	totalPages, err := apicfg.GetTotalPages(5)
 	if err != nil {
 		fmt.Printf("Error getting total pages: %v", err)
 	}
-	apicfg.totalPages = totalPages
+	apicfg.Config.TotalPages = totalPages
 
-	if apicfg.totalPages < 10 {
-		cfg.wg.Add(1)
+	if apicfg.Config.TotalPages < 10 {
+		cfg.Config.Wg.Add(1)
 		fmt.Println("Start crawling...")
-		go cfg.crawlPage(cfg.baseURL.String(), 1)
-		cfg.wg.Wait()
+		go cfg.CrawlPage(cfg.Config.BaseURL.String(), 1)
+		cfg.Config.Wg.Wait()
 	}
 
 	// printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
@@ -142,7 +148,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	server := &http.Server{
-		Addr:    ":" + apicfg.port,
+		Addr:    ":" + apicfg.Config.Port,
 		Handler: mux,
 	}
 
@@ -151,14 +157,14 @@ func main() {
 		http.Redirect(w, r, "/app/", http.StatusFound)
 	})
 	mux.Handle("/app/", fileServer)
-	mux.HandleFunc("POST /api/reset", apicfg.handlerReset)
-	mux.HandleFunc("POST /api/signup", apicfg.handlerSignup)
-	mux.HandleFunc("POST /api/login", apicfg.handlerLogin)
-	mux.HandleFunc("POST /api/refresh", apicfg.handlerRefresh)
-	mux.HandleFunc("POST /api/revoke", apicfg.handlerRevoke)
-	mux.HandleFunc("GET /api/articles", apicfg.handlerGetArticles)
-	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.handlerGetArticleFromID)
-	mux.HandleFunc("GET /api/categories/{category}/articles", apicfg.handlerGetCategoryArticles)
+	mux.HandleFunc("POST /api/reset", apicfg.HandlerReset)
+	mux.HandleFunc("POST /api/signup", apicfg.HandlerSignup)
+	mux.HandleFunc("POST /api/login", apicfg.HandlerLogin)
+	mux.HandleFunc("POST /api/refresh", apicfg.HandlerRefresh)
+	mux.HandleFunc("POST /api/revoke", apicfg.HandlerRevoke)
+	mux.HandleFunc("GET /api/articles", apicfg.HandlerGetArticles)
+	mux.HandleFunc("GET /api/articles/{articleId}", apicfg.HandlerGetArticleFromID)
+	mux.HandleFunc("GET /api/categories/{category}/articles", apicfg.HandlerGetCategoryArticles)
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(server.ListenAndServe())

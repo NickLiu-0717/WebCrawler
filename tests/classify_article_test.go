@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/NickLiu-0717/crawler/service"
+)
 
 func TestClassifyArticle(t *testing.T) {
 	tests := []struct {
@@ -21,7 +25,7 @@ func TestClassifyArticle(t *testing.T) {
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			gotCatagory, err := classifyArticle(tc.inputTitle)
+			gotCatagory, err := service.ClassifyArticle(tc.inputTitle)
 			if err != nil {
 				t.Fatalf("Test %d %v FAIL - unexpected error: %v", i, tc.name, err)
 			}

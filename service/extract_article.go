@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func extractArticles(htmlbody string) (string, string, time.Time, error) {
+func ExtractArticles(htmlbody string) (string, string, time.Time, error) {
 	doc, err := htmlquery.Parse(strings.NewReader(htmlbody))
 	if err != nil {
 		return "", "", time.Time{}, fmt.Errorf("couldn't parse html")

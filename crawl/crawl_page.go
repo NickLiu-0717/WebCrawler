@@ -1,28 +1,35 @@
-package main
+package crawl
 
 import (
 	"fmt"
 	"net/url"
+
+	"github.com/NickLiu-0717/crawler/config"
+	"github.com/NickLiu-0717/crawler/service"
 )
 
-func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
+type CrawlConfig struct {
+	Config *config.Config
+}
 
-	cfg.concurrencyControl <- struct{}{}
+func (cfg *CrawlConfig) CrawlPage(rawCurrentURL string, depth int) {
+
+	cfg.Config.ConcurrencyControl <- struct{}{}
 	defer func() {
-		<-cfg.concurrencyControl
-		cfg.wg.Done()
+		<-cfg.Config.ConcurrencyControl
+		cfg.Config.Wg.Done()
 	}()
 
-	if depth > cfg.maxDepth {
+	if depth > cfg.Config.MaxDepth {
 		return
 	}
 
-	cfg.mu.Lock()
-	if len(cfg.pages) >= cfg.maxPages {
-		cfg.mu.Unlock()
+	cfg.Config.Mu.Lock()
+	if len(cfg.Config.Pages) >= cfg.Config.MaxPages {
+		cfg.Config.Mu.Unlock()
 		return
 	}
-	cfg.mu.Unlock()
+	cfg.Config.Mu.Unlock()
 
 	parsedCurrentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
@@ -30,43 +37,43 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 		return
 	}
 
-	if cfg.baseURL.Hostname() != parsedCurrentURL.Hostname() {
+	if cfg.Config.BaseURL.Hostname() != parsedCurrentURL.Hostname() {
 		return
 	}
 	//Normalize the path
-	norCurrentURL, err := normalizeURL(parsedCurrentURL.String())
+	norCurrentURL, err := NormalizeURL(parsedCurrentURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't normalize current URL: %v\n", err)
 		return
 	}
 	//Test if the path has robots.txt restriction
-	if cfg.robotGroup != nil {
-		if !cfg.robotGroup.Test(parsedCurrentURL.Path) {
+	if cfg.Config.RobotGroup != nil {
+		if !cfg.Config.RobotGroup.Test(parsedCurrentURL.Path) {
 			fmt.Printf("URL %s is not allowed to crawl\n", parsedCurrentURL.String())
 			return
 		}
 	}
 
-	cfg.mu.Lock()
-	if _, ok := cfg.pages[norCurrentURL]; ok {
-		cfg.pages[norCurrentURL]++
-		cfg.mu.Unlock()
+	cfg.Config.Mu.Lock()
+	if _, ok := cfg.Config.Pages[norCurrentURL]; ok {
+		cfg.Config.Pages[norCurrentURL]++
+		cfg.Config.Mu.Unlock()
 		return
 	}
-	cfg.pages[norCurrentURL] = 1
-	cfg.mu.Unlock()
+	cfg.Config.Pages[norCurrentURL] = 1
+	cfg.Config.Mu.Unlock()
 
 	// fmt.Printf("Start crawling %s\n", rawCurrentURL)
 	//Random Sleep to simulate human behavior
-	randomSleep(1000, 2000)
-	html, err := getHTML(parsedCurrentURL.String())
+	config.RandomSleep(1000, 2000)
+	html, err := GetHTML(parsedCurrentURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't get HTML: %v\n", err)
 		return
 	}
 	//Check if the path is article or not, if article, extract title and content then return, no more crawling
-	if checkArticle(parsedCurrentURL.String()) {
-		gottitle, gotcontent, gotpubAt, err := extractArticles(html)
+	if service.CheckArticle(parsedCurrentURL.String()) {
+		gottitle, gotcontent, gotpubAt, err := service.ExtractArticles(html)
 		if err != nil {
 			fmt.Printf("Error - couldn't extract title and content from HTML: %v\n", err)
 			return
@@ -75,7 +82,7 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 		// 	title:   gottitle,
 		// 	content: gotcontent,
 		// }
-		gotcatagory, err := classifyArticle(gottitle)
+		gotcatagory, err := service.ClassifyArticle(gottitle)
 		if err != nil {
 			fmt.Printf("couldn't classify article by title: %v\n", err)
 			return
@@ -88,14 +95,14 @@ func (cfg *config) crawlPage(rawCurrentURL string, depth int) {
 		return
 	}
 
-	URLs, err := getURLsFromHTML(html, parsedCurrentURL.String())
+	URLs, err := GetURLsFromHTML(html, parsedCurrentURL.String())
 	if err != nil {
 		fmt.Printf("Error - couldn't get URL from HTML: %v\n", err)
 		return
 	}
 	for _, nextURL := range URLs {
-		cfg.wg.Add(1)
-		go cfg.crawlPage(nextURL, depth+1)
+		cfg.Config.Wg.Add(1)
+		go cfg.CrawlPage(nextURL, depth+1)
 	}
 
 }

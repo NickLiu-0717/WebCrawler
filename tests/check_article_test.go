@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/NickLiu-0717/crawler/service"
+)
 
 func TestCheckArticle(t *testing.T) {
 	tests := []struct {
@@ -52,7 +56,7 @@ func TestCheckArticle(t *testing.T) {
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := checkArticle(tc.inputURL)
+			result := service.CheckArticle(tc.inputURL)
 			if result != tc.expected {
 				t.Errorf("Test %d %v FAIL - expect: %v, got: %v", i, tc.name, tc.expected, result)
 			}

@@ -1,10 +1,16 @@
-package main
+package handler
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/NickLiu-0717/crawler/config"
 )
+
+type Handler struct {
+	Config *config.ApiConfig
+}
 
 func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
 	if err != nil {

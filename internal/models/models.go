@@ -1,21 +1,29 @@
-package main
+package models
 
 import (
-	"fmt"
-	"math/rand"
-	"net/url"
-	"sync"
 	"time"
 
-	database "github.com/NickLiu-0717/crawler/internal/database"
 	"github.com/google/uuid"
-	"github.com/temoto/robotstxt"
 )
 
-// type urlCount struct {
-// 	url   string
-// 	count int
-// }
+//	type urlCount struct {
+//		url   string
+//		count int
+//	}
+type Acktype int
+
+const (
+	Ack Acktype = iota
+	NackRequeue
+	NackDiscard
+)
+
+type SimpleQueueType int
+
+const (
+	SimpleQueueDurable SimpleQueueType = iota
+	SimpleQueueTransient
+)
 
 type Article struct {
 	ID           uuid.UUID `json:"id"`
@@ -42,39 +50,12 @@ type UserInfo struct {
 	Password string `json:"password"`
 }
 
-type apiConfig struct {
-	db         *database.Queries
-	port       string
-	totalPages int
-	secretKey  string
+type HtmlBody struct {
+	Html string
 }
 
-type config struct {
-	pages              map[string]int
-	baseURL            *url.URL
-	mu                 *sync.Mutex
-	concurrencyControl chan struct{}
-	wg                 *sync.WaitGroup
-	maxPages           int
-	robotGroup         *robotstxt.Group
-	maxDepth           int
-	db                 *database.Queries
-}
-
-func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*config, error) {
-	baseURL, err := url.Parse(rawBaseURL)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't parse url %v : %v", rawBaseURL, err)
-	}
-	return &config{
-		pages:              make(map[string]int),
-		baseURL:            baseURL,
-		mu:                 &sync.Mutex{},
-		concurrencyControl: make(chan struct{}, maxConcurrency),
-		wg:                 &sync.WaitGroup{},
-		maxPages:           maxPages,
-		maxDepth:           maxDepth,
-	}, nil
+type ClassifyCatagory struct {
+	Catagory string `json:"catagory"`
 }
 
 // func printPages(pages map[string]int, baseURL string) {
@@ -101,8 +82,3 @@ func configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*conf
 // 		// fmt.Printf("%s: %d\n", uc.url, uc.count)
 // 	}
 // }
-
-func randomSleep(min, max int) {
-	delay := rand.Intn(max-min) + min
-	time.Sleep(time.Duration(delay) * time.Millisecond)
-}

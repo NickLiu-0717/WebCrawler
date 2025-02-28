@@ -1,4 +1,4 @@
-package main
+package crawl
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/antchfx/htmlquery"
 )
 
-func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
+func GetURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
 	baseURL, err := url.Parse(rawBaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't parse base URL: %v", err)

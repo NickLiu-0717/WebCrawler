@@ -1,4 +1,4 @@
-package main
+package crawl
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	database "github.com/NickLiu-0717/crawler/internal/database"
 )
 
-func (cfg *config) createArticles(url, title, content, catagory string, publishAt time.Time) error {
-	_, err := cfg.db.CreateArticle(context.Background(), database.CreateArticleParams{
+func (cfg *CrawlConfig) createArticles(url, title, content, catagory string, publishAt time.Time) error {
+	_, err := cfg.Config.Db.CreateArticle(context.Background(), database.CreateArticleParams{
 		Url:         url,
 		Title:       title,
 		Content:     content,

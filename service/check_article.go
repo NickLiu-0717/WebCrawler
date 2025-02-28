@@ -1,11 +1,11 @@
-package main
+package service
 
 import (
 	"regexp"
 	"strings"
 )
 
-func checkArticle(url string) bool {
+func CheckArticle(url string) bool {
 	// 常見的文章 URL 格式（可依照實際網站調整）
 	articlePatterns := []string{
 		`/\d{4}/\d{2}/\d{2}/`,          // YYYY/MM/DD 格式 (e.g., example.com/2024/02/16/title/)

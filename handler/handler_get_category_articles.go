@@ -1,13 +1,14 @@
-package main
+package handler
 
 import (
 	"net/http"
 	"strconv"
 
 	"github.com/NickLiu-0717/crawler/internal/database"
+	"github.com/NickLiu-0717/crawler/internal/models"
 )
 
-func (apicfg *apiConfig) handlerGetCategoryArticles(w http.ResponseWriter, r *http.Request) {
+func (apicfg *Handler) HandlerGetCategoryArticles(w http.ResponseWriter, r *http.Request) {
 	cate := r.PathValue("category")
 
 	pageStr := r.URL.Query().Get("page")
@@ -25,7 +26,7 @@ func (apicfg *apiConfig) handlerGetCategoryArticles(w http.ResponseWriter, r *ht
 
 	offset := (page - 1) * limit
 
-	dbArticles, err := apicfg.db.GetLatestCategoryArticles(r.Context(), database.GetLatestCategoryArticlesParams{
+	dbArticles, err := apicfg.Config.Db.GetLatestCategoryArticles(r.Context(), database.GetLatestCategoryArticlesParams{
 		Catagory: cate,
 		Limit:    int32(limit),
 		Offset:   int32(offset),
@@ -35,9 +36,9 @@ func (apicfg *apiConfig) handlerGetCategoryArticles(w http.ResponseWriter, r *ht
 		return
 	}
 
-	var articles []Article
+	var articles []models.Article
 	for _, dbArticle := range dbArticles {
-		article := Article{
+		article := models.Article{
 			ID:           dbArticle.ID,
 			URL:          dbArticle.Url,
 			Title:        dbArticle.Title,

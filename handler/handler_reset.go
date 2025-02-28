@@ -1,14 +1,14 @@
-package main
+package handler
 
 import "net/http"
 
-func (apicfg *apiConfig) handlerReset(w http.ResponseWriter, r *http.Request) {
-	if err := apicfg.db.DeleteArticles(r.Context()); err != nil {
+func (apicfg *Handler) HandlerReset(w http.ResponseWriter, r *http.Request) {
+	if err := apicfg.Config.Db.DeleteArticles(r.Context()); err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't delete articles", err)
 		return
 	}
 
-	if err := apicfg.db.DeleteUsers(r.Context()); err != nil {
+	if err := apicfg.Config.Db.DeleteUsers(r.Context()); err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't delete users", err)
 		return
 	}

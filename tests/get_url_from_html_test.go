@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/NickLiu-0717/crawler/crawl"
 )
 
 func TestGetURLFromHTML(t *testing.T) {
@@ -189,7 +191,7 @@ func TestGetURLFromHTML(t *testing.T) {
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			getURLs, err := getURLsFromHTML(tc.inputBody, tc.inputURL)
+			getURLs, err := crawl.GetURLsFromHTML(tc.inputBody, tc.inputURL)
 			if err != nil {
 				t.Fatalf("Test %v - %v FAIL: unexpected error: %v", i, tc.name, err)
 			}
@@ -201,7 +203,7 @@ func TestGetURLFromHTML(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			getURLs, err := getURLsFromHTML(tc.inputBody, tc.inputURL)
+			getURLs, err := crawl.GetURLsFromHTML(tc.inputBody, tc.inputURL)
 			if err != nil && !strings.Contains(err.Error(), tc.errorContains) {
 				t.Errorf("Test %v - '%s' FAIL: unexpected error: %v", i, tc.name, err)
 				return

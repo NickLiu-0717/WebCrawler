@@ -1,4 +1,4 @@
-package main
+package crawl
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func getHTML(rawURL string) (string, error) {
+func GetHTML(rawURL string) (string, error) {
 	parseURL, err := url.Parse(rawURL)
 	if err != nil {
 		return "", fmt.Errorf("couldn't parse raw URL: %v", err)

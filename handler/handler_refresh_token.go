@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"net/http"
@@ -10,20 +10,20 @@ type AccessToken struct {
 	Token string `json:"token"`
 }
 
-func (apicfg *apiConfig) handlerRefresh(w http.ResponseWriter, r *http.Request) {
+func (apicfg *Handler) HandlerRefresh(w http.ResponseWriter, r *http.Request) {
 	refreshToken, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "no refresh token found", err)
 		return
 	}
 
-	userID, err := apicfg.db.GetUserFromRefreshToken(r.Context(), refreshToken)
+	userID, err := apicfg.Config.Db.GetUserFromRefreshToken(r.Context(), refreshToken)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "invalid refresh token", err)
 		return
 	}
 
-	token, err := auth.MakeJWT(userID, apicfg.secretKey)
+	token, err := auth.MakeJWT(userID, apicfg.Config.SecretKey)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't create JWT", err)
 		return
@@ -32,13 +32,13 @@ func (apicfg *apiConfig) handlerRefresh(w http.ResponseWriter, r *http.Request) 
 	respondWithJSON(w, http.StatusOK, accessToken)
 }
 
-func (apicfg *apiConfig) handlerRevoke(w http.ResponseWriter, r *http.Request) {
+func (apicfg *Handler) HandlerRevoke(w http.ResponseWriter, r *http.Request) {
 	refreshToken, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "no refresh token found", err)
 	}
 
-	if err = apicfg.db.UpdateRefreshToken(r.Context(), refreshToken); err != nil {
+	if err = apicfg.Config.Db.UpdateRefreshToken(r.Context(), refreshToken); err != nil {
 		respondWithError(w, http.StatusUnauthorized, "invalid refresh token", err)
 	}
 
