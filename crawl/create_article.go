@@ -4,10 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/NickLiu-0717/crawler/config"
 	database "github.com/NickLiu-0717/crawler/internal/database"
 )
 
-func (cfg *CrawlConfig) createArticles(url, title, content, catagory string, publishAt time.Time) error {
+type CrawlConfig struct {
+	Config *config.Config
+}
+
+func (cfg *CrawlConfig) CreateArticles(url, title, content, catagory string, publishAt time.Time) error {
 	_, err := cfg.Config.Db.CreateArticle(context.Background(), database.CreateArticleParams{
 		Url:         url,
 		Title:       title,
@@ -15,8 +20,5 @@ func (cfg *CrawlConfig) createArticles(url, title, content, catagory string, pub
 		Catagory:    catagory,
 		PublishedAt: publishAt,
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

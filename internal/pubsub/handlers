@@ -1,7 +1,0 @@
-// package pubsub
-
-// import "github.com/NickLiu-0717/crawler/internal/models"
-
-// func handlerExtractArticle(html models.HtmlBody) Acktype {
-
-// }

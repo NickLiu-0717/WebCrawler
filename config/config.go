@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"math/rand"
-	"net/url"
 	"sync"
 	"time"
 
@@ -20,29 +18,25 @@ type ApiConfig struct {
 
 type Config struct {
 	Pages              map[string]int
-	BaseURL            *url.URL
+	BaseURLs           []string
 	Mu                 *sync.Mutex
 	ConcurrencyControl chan struct{}
 	Wg                 *sync.WaitGroup
 	MaxPages           int
-	RobotGroup         *robotstxt.Group
+	RobotGroup         []*robotstxt.Group
 	MaxDepth           int
 	Db                 *database.Queries
 }
 
-func Configure(rawBaseURL string, maxConcurrency, maxPages, maxDepth int) (*Config, error) {
-	baseURL, err := url.Parse(rawBaseURL)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't parse url %v : %v", rawBaseURL, err)
-	}
+func Configure(rawBaseURLs []string, maxConcurrency, maxPages, maxDepth int) (*Config, error) {
 	return &Config{
 		Pages:              make(map[string]int),
-		BaseURL:            baseURL,
+		BaseURLs:           rawBaseURLs,
 		Mu:                 &sync.Mutex{},
 		ConcurrencyControl: make(chan struct{}, maxConcurrency),
-		Wg:                 &sync.WaitGroup{},
-		MaxPages:           maxPages,
-		MaxDepth:           maxDepth,
+		// Wg:                 &sync.WaitGroup{},
+		MaxPages: maxPages,
+		MaxDepth: maxDepth,
 	}, nil
 }
 

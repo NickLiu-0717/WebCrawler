@@ -92,36 +92,6 @@
         let currentPage = 1;
         let pageSize = 5;
 
-        // async function fetchArticles(category = null, page = 1) {
-        //     let apiUrl = `http://localhost:8080/api/articles?page=${page}&limit=${pageSize}`;
-        //     if (category) {
-        //         apiUrl = `http://localhost:8080/api/categories/${category}/articles?page=${page}&limit=${pageSize}`;
-        //     }
-
-        //     try {
-                // let token = localStorage.getItem("token");
-                // let response = await fetch(apiUrl, {
-                //     headers: token ? { "Authorization": `Bearer ${token}` } : {}
-                // });
-
-                // if (!response.ok) {
-                //     if (response.status === 401) {
-                //         await refreshToken();
-                //         return fetchArticles(category, page);
-                //     }
-                //     throw new Error("Failed to fetch articles");
-                // }
-
-        //         let articles = await response.json();
-        //         displayArticles(articles);
-        //         currentPage = page;
-        //         updatePagination();
-        //     } catch (error) {
-        //         document.getElementById("article-container").innerHTML = "<p>No articles found.</p>";
-        //         console.error("Error fetching articles:", error);
-        //     }
-        // }
-
         async function fetchArticles(category = null, page = 1, forceRefresh = true) {
 
             let token = localStorage.getItem("token");

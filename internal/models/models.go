@@ -10,20 +10,6 @@ import (
 //		url   string
 //		count int
 //	}
-type Acktype int
-
-const (
-	Ack Acktype = iota
-	NackRequeue
-	NackDiscard
-)
-
-type SimpleQueueType int
-
-const (
-	SimpleQueueDurable SimpleQueueType = iota
-	SimpleQueueTransient
-)
 
 type Article struct {
 	ID           uuid.UUID `json:"id"`
@@ -50,7 +36,8 @@ type UserInfo struct {
 	Password string `json:"password"`
 }
 
-type HtmlBody struct {
+type Message struct {
+	Url  string
 	Html string
 }
 
