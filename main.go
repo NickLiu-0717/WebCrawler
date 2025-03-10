@@ -63,55 +63,6 @@ func main() {
 	dbQueries := database.New(db)
 	defer db.Close()
 
-	// switch len(cmdArg) {
-	// case 1:
-	// 	fmt.Println("Error - need arguments: website maxConcurrency maxPages")
-	// 	os.Exit(1)
-	// case 2:
-	// 	maxConcurrency = defaultMaxConcurrency
-	// 	maxPages = defaultMaxPages
-	// 	maxDepth = defaultMaxDepth
-	// case 3:
-	// 	maxConcurrency, err = strconv.Atoi(cmdArg[2])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxPages = defaultMaxPages
-	// 	maxDepth = defaultMaxDepth
-	// case 4:
-	// 	maxConcurrency, err = strconv.Atoi(cmdArg[2])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxPages, err = strconv.Atoi(cmdArg[3])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxDepth = defaultMaxDepth
-	// case 5:
-	// 	maxConcurrency, err = strconv.Atoi(cmdArg[2])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxPages, err = strconv.Atoi(cmdArg[3])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// 	maxDepth, err = strconv.Atoi(cmdArg[4])
-	// 	if err != nil {
-	// 		fmt.Println("Error - couldn't convert input string to integer")
-	// 		return
-	// 	}
-	// default:
-	// 	fmt.Println("Error - too many arguments provided")
-	// 	os.Exit(1)
-	// }
-
 	baseURLs := []string{
 		// "https://www.bbc.com/",
 		"https://edition.cnn.com/",
@@ -149,18 +100,6 @@ func main() {
 		fmt.Printf("Error - couldn't get total pages: %v\n", err)
 	}
 	apicfg.Config.TotalPages = totalPages
-
-	// if apicfg.Config.TotalPages < 10 {
-	// 	// cfg.Config.Wg.Add(1)
-	// 	fmt.Println("Start crawling...")
-	// 	go cfg.CrawlPage(cfg.Config.BaseURL.String(), 1)
-	// 	// cfg.Config.Wg.Wait()
-	// }
-
-	// printPages(cfg.pages, strings.TrimSuffix(cfg.baseURL.String(), "/"))
-	// for key, article := range cfg.articles {
-	// 	fmt.Printf("From: %s, Title: %s\n", key, article.title)
-	// }
 
 	connc, err := amqp.Dial(amqpString)
 	if err != nil {
