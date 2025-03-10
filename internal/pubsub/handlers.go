@@ -66,7 +66,7 @@ func HandlerExtractURLs(cfg *crawl.CrawlConfig, pubChannel *amqp.Channel) func(m
 
 		cfg.Config.Mu.Lock()
 		if len(cfg.Config.Pages) >= cfg.Config.MaxPages {
-			fmt.Println("Reached max pages limit, stopping further crawling.")
+			// fmt.Println("Reached max pages limit, stopping further crawling.")
 			cfg.Config.Mu.Unlock()
 			return Ack
 		}
@@ -109,7 +109,7 @@ func HandlerExtractURLs(cfg *crawl.CrawlConfig, pubChannel *amqp.Channel) func(m
 				// defer wg.Done()
 				cfg.Config.Mu.Lock()
 				if len(cfg.Config.Pages) >= cfg.Config.MaxPages {
-					fmt.Println("Reached max pages limit, stopping further crawling.")
+					// fmt.Println("Reached max pages limit, stopping further crawling.")
 					cfg.Config.Mu.Unlock()
 					return
 				}
