@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/temoto/robotstxt"
 )
 
-func checkRobotsTxt(baseURL string) (*robotstxt.Group, error) {
+func CheckRobotsTxt(baseURL string) (*robotstxt.Group, error) {
 	robotsURL := baseURL + "/robots.txt"
 
 	resp, err := http.Get(robotsURL)

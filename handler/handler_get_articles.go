@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -7,9 +7,10 @@ import (
 
 	"github.com/NickLiu-0717/crawler/internal/auth"
 	"github.com/NickLiu-0717/crawler/internal/database"
+	"github.com/NickLiu-0717/crawler/internal/models"
 )
 
-func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Request) {
+func (apicfg *Handler) HandlerGetArticles(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
@@ -17,7 +18,7 @@ func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = auth.ValidateJWT(token, apicfg.secretKey)
+	_, err = auth.ValidateJWT(token, apicfg.Config.SecretKey)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "invalid or expired access token", err)
 		return
@@ -38,15 +39,15 @@ func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Reque
 
 	offset := (page - 1) * limit
 
-	totolPages, err := apicfg.getTotalPages(limit)
+	totolPages, err := apicfg.GetTotalPages(limit)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't get total pages", err)
 		return
 	}
-	apicfg.totalPages = totolPages
+	apicfg.Config.TotalPages = totolPages
 
 	w.Header().Set("Content-Type", "application/json")
-	dbArticles, err := apicfg.db.GetLatestArticles(r.Context(), database.GetLatestArticlesParams{
+	dbArticles, err := apicfg.Config.Db.GetLatestArticles(r.Context(), database.GetLatestArticlesParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	})
@@ -55,9 +56,9 @@ func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var articles []Article
+	var articles []models.Article
 	for _, dbArticle := range dbArticles {
-		article := Article{
+		article := models.Article{
 			ID:           dbArticle.ID,
 			URL:          dbArticle.Url,
 			Title:        dbArticle.Title,
@@ -72,8 +73,8 @@ func (apicfg *apiConfig) handlerGetArticles(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusOK, articles)
 }
 
-func (apicfg *apiConfig) getTotalPages(limit int) (int, error) {
-	totalCount, err := apicfg.db.GetTotalArticleCount(context.Background())
+func (apicfg *Handler) GetTotalPages(limit int) (int, error) {
+	totalCount, err := apicfg.Config.Db.GetTotalArticleCount(context.Background())
 	if err != nil {
 		return 0, err
 	}

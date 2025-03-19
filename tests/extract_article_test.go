@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/NickLiu-0717/crawler/crawl"
+	"github.com/NickLiu-0717/crawler/service"
 )
 
 func TestExtarctArticle(t *testing.T) {
@@ -52,11 +55,11 @@ func TestExtarctArticle(t *testing.T) {
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			htmlbody, err := getHTML(tc.inputURL)
+			htmlbody, err := crawl.GetHTML(tc.inputURL)
 			if err != nil {
 				t.Fatal(err)
 			}
-			gottitle, gotcontent, _, err := extractArticles(htmlbody)
+			gottitle, gotcontent, _, err := service.ExtractArticles(htmlbody)
 			if err != nil {
 				t.Fatal(err)
 			}

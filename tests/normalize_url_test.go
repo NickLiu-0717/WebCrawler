@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 	"testing"
+
+	"github.com/NickLiu-0717/crawler/crawl"
 )
 
 func TestNormalizeURL(t *testing.T) {
@@ -36,7 +38,7 @@ func TestNormalizeURL(t *testing.T) {
 	}
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			getResult, err := normalizeURL(tc.inputURL)
+			getResult, err := crawl.NormalizeURL(tc.inputURL)
 			if err != nil && !strings.Contains(err.Error(), tc.errorContains) {
 				t.Fatalf("Test %v - '%s' FAIL: error %v", i, tc.name, err)
 			}

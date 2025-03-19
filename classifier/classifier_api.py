@@ -6,20 +6,21 @@ import logging
 logging.getLogger("transformers.modeling_utils").setLevel(logging.ERROR)
 
 app = FastAPI()
-
+MODEL_PATH = "/app/model"
 class ClassifyRequest(BaseModel):
     title: str
 
 classifier = pipeline(
     "zero-shot-classification",
-    model="joeddav/xlm-roberta-large-xnli",
-    device=0,
+    model=MODEL_PATH,
+    device=-1,
     framework="pt",
-    torch_dtype=torch.float16
+    torch_dtype=torch.float16,
+    tokenizer=MODEL_PATH
 )
 
 # article = "研究揭清冠一號可抑制A型流感 降低發炎改善症狀 ｜ 公視新聞網 PNN"
-labels = ["technology", "sports", "politics", "society", "environment", "entertainment", "health"]
+labels = ["technology", "sports", "politics", "society", "entertainment", "health"]
 
 # 讓 `pipeline()` 執行推理
 # result = classifier(article, candidate_labels=labels)
@@ -34,4 +35,4 @@ async def classify_article(request: ClassifyRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,12 +1,13 @@
-package main
+package handler
 
 import (
 	"net/http"
 
+	"github.com/NickLiu-0717/crawler/internal/models"
 	"github.com/google/uuid"
 )
 
-func (apicfg *apiConfig) handlerGetArticleFromID(w http.ResponseWriter, r *http.Request) {
+func (apicfg *Handler) HandlerGetArticleFromID(w http.ResponseWriter, r *http.Request) {
 	aID := r.PathValue("articleId")
 	articleID, err := uuid.Parse(aID)
 	if err != nil {
@@ -14,13 +15,13 @@ func (apicfg *apiConfig) handlerGetArticleFromID(w http.ResponseWriter, r *http.
 		return
 	}
 
-	dbArticle, err := apicfg.db.GetArticleByID(r.Context(), articleID)
+	dbArticle, err := apicfg.Config.Db.GetArticleByID(r.Context(), articleID)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, "article not found", err)
 		return
 	}
 
-	article := Article{
+	article := models.Article{
 		ID:           dbArticle.ID,
 		URL:          dbArticle.Url,
 		Title:        dbArticle.Title,

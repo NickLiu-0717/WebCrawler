@@ -5,3 +5,4 @@ classifier/venv/
 classifier/__pycache__/
 classifier/*.pyc
 classifier/*.pyo
+app/model/
