@@ -10,7 +10,7 @@ import (
 )
 
 func ClassifyArticle(title string) (string, error) {
-	url := "http://127.0.0.1:8000/classify/"
+	url := "http://classifier:8000/classify/"
 
 	jsonbody, err := json.Marshal(map[string]string{"title": title})
 	if err != nil {

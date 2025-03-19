@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# if ! command -v goose &> /dev/null; then
+#     echo "🚨 goose 未安裝，正在安裝..."
+#     go install github.com/pressly/goose/v3/cmd/goose@latest
+# fi
+
 # 檢查是否已安裝 PostgreSQL
 # if ! command -v psql &> /dev/null; then
 #     echo "🚨 PostgreSQL 未安裝，正在安裝..."
@@ -43,6 +48,9 @@ DB_PASS="postgres"
 #     echo "✅ 資料庫 $DB_NAME 已存在，跳過建立步驟。"
 # fi
 
+
+
+
 # cd sql/schema
 # goose postgres "postgres://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME" up
 # cd ../..
@@ -83,6 +91,6 @@ fi
 
 # 啟動 Go Web Crawler
 echo "🚀 啟動 Go Web Crawler..."
-go run . "https://www.bbc.com/" 150 100 3
+go run .
 
 

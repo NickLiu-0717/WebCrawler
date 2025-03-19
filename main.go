@@ -66,7 +66,7 @@ func main() {
 	baseURLs := []string{
 		// "https://www.bbc.com/",
 		"https://edition.cnn.com/",
-		"https://www.forbes.com/",
+		// "https://www.forbes.com/",
 		"https://news.ebc.net.tw",
 		"https://news.pts.org.tw/",
 	}

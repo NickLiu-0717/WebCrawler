@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: crawler
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 5s
+      retries: 5
+
+  classifier:
+    build: ./classifier
+    container_name: classifier
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-X", "POST", "-H", "Content-Type: application/json", "-d", '{"title": "Stock market reaches record high"}', "http://localhost:8000/classify/"]
+      interval: 5s
+      retries: 5
+    volumes:
+      - ./app/model:/app/model
+    command: ["python3", "classifier_api.py"]
+
+  webcrawler:
+    build: .
+    container_name: webcrawler
+    restart: always
+    depends_on:
+      classifier:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/crawler?sslmode=disable"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
+    ports:
+      - "8080:8080"
+    entrypoint: ["/app/entrypoint.sh"]
+
+volumes:
+  postgres_data:
