@@ -1,6 +1,9 @@
 package handler
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 func (apicfg *Handler) HandlerReset(w http.ResponseWriter, r *http.Request) {
 	if err := apicfg.Config.Db.DeleteArticles(r.Context()); err != nil {
@@ -14,5 +17,10 @@ func (apicfg *Handler) HandlerReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Reset Successfully"))
+	_, err := w.Write([]byte("Reset Successfully"))
+	if err != nil {
+		log.Printf("Error writing JSON: %s", err)
+		w.WriteHeader(500)
+		return
+	}
 }

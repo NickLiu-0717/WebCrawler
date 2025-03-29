@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/NickLiu-0717/crawler/config"
 	"github.com/NickLiu-0717/crawler/crawl"
@@ -24,51 +25,51 @@ const maxConcurrency = 100
 const maxPages = 100
 const maxDepth = 5
 
-// var newsPages []string = []string{
-// 	"https://www.bbc.com/",
-// 	"https://edition.cnn.com/",
-// 	"https://www.forbes.com/",
-// 	"https://news.ebc.net.tw",
-// 	"https://news.pts.org.tw/",
-// }
+func mustGetEnv(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("Missing required environment variable: %s", key)
+	}
+	return value
+}
+
+func initEnv() {
+	if err := godotenv.Load(); err != nil {
+		log.Printf(".env file not found, continuing with system environment variables")
+	}
+}
 
 func main() {
 
 	var err error
 
-	// cmdArg := os.Args
+	initEnv()
 
-	godotenv.Load()
+	// Load PostgreSQL environment variables
+	dbUser := mustGetEnv("POSTGRES_USER")
+	dbPassword := mustGetEnv("POSTGRES_PASSWORD")
+	dbHost := mustGetEnv("POSTGRES_HOST")
+	dbPort := mustGetEnv("POSTGRES_PORT")
+	dbName := mustGetEnv("POSTGRES_DB")
 
-	dbURL := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_HOST"),
-		os.Getenv("POSTGRES_PORT"),
-		os.Getenv("POSTGRES_DB"),
+	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
 	)
-	if dbURL == "" {
-		log.Fatal("PostgreSQL environment variables must be set")
-	}
-	amqpString := fmt.Sprintf(
-		"amqp://%s:%s@%s:%s/",
-		os.Getenv("RABBITMQ_USER"),
-		os.Getenv("RABBITMQ_PASSWORD"),
-		os.Getenv("RABBITMQ_HOST"),
-		os.Getenv("RABBITMQ_PORT"),
+
+	// Load RabbitMQ environment variables
+	amqpUser := mustGetEnv("RABBITMQ_USER")
+	amqpPassword := mustGetEnv("RABBITMQ_PASSWORD")
+	amqpHost := mustGetEnv("RABBITMQ_HOST")
+	amqpPort := mustGetEnv("RABBITMQ_PORT")
+
+	amqpString := fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		amqpUser, amqpPassword, amqpHost, amqpPort,
 	)
-	if amqpString == "" {
-		log.Fatal("RabbitMQ environment variables must be set")
-	}
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT must be set")
-	}
-	secretKey := os.Getenv("SECRET_KEY")
-	if secretKey == "" {
-		log.Fatal("secretKey must be set")
-	}
+
+	// Load other configs
+	port := mustGetEnv("PORT")
+	secretKey := mustGetEnv("SECRET_KEY")
+
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Printf("Error opening database: %s", err)
@@ -183,8 +184,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	server := &http.Server{
-		Addr:    ":" + apicfg.Config.Port,
-		Handler: mux,
+		Addr:              ":" + apicfg.Config.Port,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	fileServer := http.StripPrefix("/app/", http.FileServer(http.Dir("./static")))
