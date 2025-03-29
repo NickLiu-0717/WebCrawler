@@ -49,14 +49,27 @@ cd WebCrawler
 
 2. 設定 `.env` 檔案
 
-3. 啟動服務：
+3. 下載預訓練模型至本地
+```
+python3 -c "
+from transformers import AutoModelForSequenceClassification, AutoTokenizer;
+
+model_name = 'joeddav/xlm-roberta-large-xnli'
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+model.save_pretrained('app/model')
+tokenizer.save_pretrained('app/model')
+"
+```
+
+4. 啟動服務：
 ```bash
 docker-compose up --build
 ```
 
-4. API 使用方式：
-- `POST /crawl`：提交一個網址進行爬蟲與分類
-- 需帶入 JWT Token 作為認證
+5. API 使用方式：
+- http://localhost:${port}
 
 ### RabbitMQ 管理介面
 - 服務啟動後可透過 [http://localhost:15672](http://localhost:15672) 進入 RabbitMQ 管理介面
