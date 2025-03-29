@@ -40,9 +40,26 @@ func main() {
 
 	godotenv.Load()
 
-	dbURL := os.Getenv("DB_URL")
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_PORT"),
+		os.Getenv("POSTGRES_DB"),
+	)
 	if dbURL == "" {
-		log.Fatal("DB_URL must be set")
+		log.Fatal("PostgreSQL environment variables must be set")
+	}
+	amqpString := fmt.Sprintf(
+		"amqp://%s:%s@%s:%s/",
+		os.Getenv("RABBITMQ_USER"),
+		os.Getenv("RABBITMQ_PASSWORD"),
+		os.Getenv("RABBITMQ_HOST"),
+		os.Getenv("RABBITMQ_PORT"),
+	)
+	if amqpString == "" {
+		log.Fatal("RabbitMQ environment variables must be set")
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -50,10 +67,6 @@ func main() {
 	}
 	secretKey := os.Getenv("SECRET_KEY")
 	if secretKey == "" {
-		log.Fatal("secretKey must be set")
-	}
-	amqpString := os.Getenv("AMQP_CONNECT_STRING")
-	if amqpString == "" {
 		log.Fatal("secretKey must be set")
 	}
 	db, err := sql.Open("postgres", dbURL)
