@@ -1,7 +1,9 @@
 package config
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"log"
+	"math/big"
 	"sync"
 	"time"
 
@@ -41,6 +43,14 @@ func Configure(rawBaseURLs []string, maxConcurrency, maxPages, maxDepth int) (*C
 }
 
 func RandomSleep(min, max int) {
-	delay := rand.Intn(max-min) + min
+	if max <= min {
+		return
+	}
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+	if err != nil {
+		log.Printf("failed to generate secure random delay: %v", err)
+		return
+	}
+	delay := int(n.Int64()) + min
 	time.Sleep(time.Duration(delay) * time.Millisecond)
 }

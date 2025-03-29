@@ -10,7 +10,7 @@ import (
 func CheckRobotsTxt(baseURL string) (*robotstxt.Group, error) {
 	robotsURL := baseURL + "/robots.txt"
 
-	resp, err := http.Get(robotsURL)
+	resp, err := http.Get(robotsURL) // #nosec G107 -- robotsURL is internally generated and safe
 	if err != nil {
 		fmt.Println("No robots.txt on:", baseURL)
 		return nil, nil

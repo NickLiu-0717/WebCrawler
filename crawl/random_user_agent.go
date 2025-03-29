@@ -1,11 +1,10 @@
 package crawl
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"log"
+	"math/big"
 )
-
-var rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var userAgents = []string{
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
@@ -15,5 +14,11 @@ var userAgents = []string{
 }
 
 func getRandomUserAgent() string {
-	return userAgents[rnd.Intn(len(userAgents))]
+	max := big.NewInt(int64(len(userAgents)))
+	n, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		log.Printf("failed to get secure random index: %v", err)
+		return userAgents[0]
+	}
+	return userAgents[n.Int64()]
 }

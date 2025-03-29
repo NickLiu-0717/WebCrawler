@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -36,8 +38,18 @@ func (apicfg *Handler) HandlerGetArticles(w http.ResponseWriter, r *http.Request
 	if err != nil || limit < 1 {
 		limit = 5
 	}
-
 	offset := (page - 1) * limit
+
+	lim, err := safeIntTo32(limit)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "int overflow", err)
+		return
+	}
+	off, err := safeIntTo32(offset)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "int overflow", err)
+		return
+	}
 
 	totolPages, err := apicfg.GetTotalPages(limit)
 	if err != nil {
@@ -48,8 +60,8 @@ func (apicfg *Handler) HandlerGetArticles(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 	dbArticles, err := apicfg.Config.Db.GetLatestArticles(r.Context(), database.GetLatestArticlesParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:  lim,
+		Offset: off,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't get article", err)
@@ -80,4 +92,11 @@ func (apicfg *Handler) GetTotalPages(limit int) (int, error) {
 	}
 	totalPages := (int(totalCount) + limit - 1) / limit
 	return totalPages, nil
+}
+
+func safeIntTo32(i int) (int32, error) {
+	if i > math.MaxInt32 || i < math.MinInt32 {
+		return 0, fmt.Errorf("value %d is out of int32 range", i)
+	}
+	return int32(i), nil
 }

@@ -4,15 +4,15 @@ services:
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_DB: crawler
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 5s
       retries: 5
 
@@ -21,8 +21,8 @@ services:
     container_name: rabbitmq
     restart: always
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -58,11 +58,20 @@ services:
         condition: service_healthy
 
     environment:
-      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/crawler?sslmode=disable"
-      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      PORT: ${PORT}
+      SECRET_KEY: ${SECRET_KEY}
     ports:
-      - "8080:8080"
-    entrypoint: ["/app/entrypoint.sh"]
+      - "${PORT}:${PORT}"
+    command: ["/app/entrypoint.sh"]
 
 volumes:
   postgres_data:

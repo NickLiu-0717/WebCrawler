@@ -26,10 +26,21 @@ func (apicfg *Handler) HandlerGetCategoryArticles(w http.ResponseWriter, r *http
 
 	offset := (page - 1) * limit
 
+	lim, err := safeIntTo32(limit)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "int overflow", err)
+		return
+	}
+	off, err := safeIntTo32(offset)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "int overflow", err)
+		return
+	}
+
 	dbArticles, err := apicfg.Config.Db.GetLatestCategoryArticles(r.Context(), database.GetLatestCategoryArticlesParams{
 		Catagory: cate,
-		Limit:    int32(limit),
-		Offset:   int32(offset),
+		Limit:    lim,
+		Offset:   off,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "couldn't get articles by category from database", err)

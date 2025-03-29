@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/NickLiu-0717/crawler/config"
 	"github.com/NickLiu-0717/crawler/crawl"
@@ -24,38 +25,51 @@ const maxConcurrency = 100
 const maxPages = 100
 const maxDepth = 5
 
-// var newsPages []string = []string{
-// 	"https://www.bbc.com/",
-// 	"https://edition.cnn.com/",
-// 	"https://www.forbes.com/",
-// 	"https://news.ebc.net.tw",
-// 	"https://news.pts.org.tw/",
-// }
+func mustGetEnv(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("Missing required environment variable: %s", key)
+	}
+	return value
+}
+
+func initEnv() {
+	if err := godotenv.Load(); err != nil {
+		log.Printf(".env file not found, continuing with system environment variables")
+	}
+}
 
 func main() {
 
 	var err error
 
-	// cmdArg := os.Args
+	initEnv()
 
-	godotenv.Load()
+	// Load PostgreSQL environment variables
+	dbUser := mustGetEnv("POSTGRES_USER")
+	dbPassword := mustGetEnv("POSTGRES_PASSWORD")
+	dbHost := mustGetEnv("POSTGRES_HOST")
+	dbPort := mustGetEnv("POSTGRES_PORT")
+	dbName := mustGetEnv("POSTGRES_DB")
 
-	dbURL := os.Getenv("DB_URL")
-	if dbURL == "" {
-		log.Fatal("DB_URL must be set")
-	}
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT must be set")
-	}
-	secretKey := os.Getenv("SECRET_KEY")
-	if secretKey == "" {
-		log.Fatal("secretKey must be set")
-	}
-	amqpString := os.Getenv("AMQP_CONNECT_STRING")
-	if amqpString == "" {
-		log.Fatal("secretKey must be set")
-	}
+	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
+	)
+
+	// Load RabbitMQ environment variables
+	amqpUser := mustGetEnv("RABBITMQ_USER")
+	amqpPassword := mustGetEnv("RABBITMQ_PASSWORD")
+	amqpHost := mustGetEnv("RABBITMQ_HOST")
+	amqpPort := mustGetEnv("RABBITMQ_PORT")
+
+	amqpString := fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		amqpUser, amqpPassword, amqpHost, amqpPort,
+	)
+
+	// Load other configs
+	port := mustGetEnv("PORT")
+	secretKey := mustGetEnv("SECRET_KEY")
+
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Printf("Error opening database: %s", err)
@@ -170,8 +184,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	server := &http.Server{
-		Addr:    ":" + apicfg.Config.Port,
-		Handler: mux,
+		Addr:              ":" + apicfg.Config.Port,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	fileServer := http.StripPrefix("/app/", http.FileServer(http.Dir("./static")))
