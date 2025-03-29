@@ -69,7 +69,7 @@ docker-compose up --build
 ```
 
 5. API 使用方式：
-- http://localhost:<PORT>（PORT 由 `.env` 中的設定決定，例如 `PORT=8080`）
+- http://localhost:`<PORT>`（PORT 由 `.env` 中的設定決定，例如 `PORT=8080`）
 
 ### RabbitMQ 管理介面
 - 服務啟動後可透過 [http://localhost:15672](http://localhost:15672) 進入 RabbitMQ 管理介面
