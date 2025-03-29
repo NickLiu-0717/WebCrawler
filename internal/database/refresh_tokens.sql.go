@@ -22,7 +22,7 @@ VALUES (
     NULL
 )
 RETURNING token, created_at, updated_at, user_id, expires_at, revoked_at
-`// #nosec G101 -- false positive
+` // #nosec G101 -- false positive
 
 type CreateRefreshTokenParams struct {
 	Token  string
@@ -45,7 +45,7 @@ func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshToken
 
 const deleteAllRefreshTokens = `-- name: DeleteAllRefreshTokens :exec
 DELETE FROM refresh_tokens
-`// #nosec G101 -- false positive
+` // #nosec G101 -- false positive
 
 func (q *Queries) DeleteAllRefreshTokens(ctx context.Context) error {
 	_, err := q.db.ExecContext(ctx, deleteAllRefreshTokens)
@@ -55,7 +55,7 @@ func (q *Queries) DeleteAllRefreshTokens(ctx context.Context) error {
 const getUserFromRefreshToken = `-- name: GetUserFromRefreshToken :one
 Select user_id from refresh_tokens
 where (token = $1) and (expires_at > NOW()) and (revoked_at is NULL)
-`// #nosec G101 -- false positive
+` // #nosec G101 -- false positive
 
 func (q *Queries) GetUserFromRefreshToken(ctx context.Context, token string) (uuid.UUID, error) {
 	row := q.db.QueryRowContext(ctx, getUserFromRefreshToken, token)
@@ -68,7 +68,7 @@ const updateRefreshToken = `-- name: UpdateRefreshToken :exec
 Update refresh_tokens
 set updated_at = NOW(), revoked_at = NOW()
 where token = $1
-`// #nosec G101 -- false positive
+` // #nosec G101 -- false positive
 
 func (q *Queries) UpdateRefreshToken(ctx context.Context, token string) error {
 	_, err := q.db.ExecContext(ctx, updateRefreshToken, token)
