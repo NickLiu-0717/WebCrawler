@@ -17,7 +17,7 @@
 | 類別         | 技術                             |
 |--------------|----------------------------------|
 | 語言         | Go, Python                       |
-| 爬蟲         | Go net/http, goquery             |
+| 爬蟲         | Go net/http                      |
 | 任務佇列     | RabbitMQ                         |
 | 模型分類     | Python + 預訓練分類模型           |
 | 身分認證     | JWT (JSON Web Token)             |
