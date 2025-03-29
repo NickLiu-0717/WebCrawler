@@ -1,6 +1,6 @@
 
 # WebCrawler
-
+A distributed web crawler system with article classification capabilities.
 一個具備文章分類能力的分散式網路爬蟲系統，支援 JWT 身份驗證與 RabbitMQ 任務分派，使用 Python 預訓練模型進行內容分類，將結果儲存於 PostgreSQL，整個系統可部署於 Docker 環境中。此專案目標為實作一個可擴充、可維護的後端系統，並展示我作為後端工程師的技術整合與架構能力。
 
 ## 專案功能
