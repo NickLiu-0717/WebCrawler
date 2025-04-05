@@ -10,14 +10,14 @@ ENV HF_HOME=/app/model
 # 複製 Python 依賴
 COPY requirements.txt .
 
-# 安裝 Python 依賴
+# 安裝 Python 套件
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 預先下載 Hugging Face 模型
-RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('joeddav/xlm-roberta-large-xnli')"
-
-# 複製程式碼
+# 複製程式碼與 entrypoint
 COPY . .
 
-# 執行 Python API
-CMD ["python3", "classifier_api.py"]
+# 設定 entrypoint.sh 可執行
+RUN chmod +x /app/entrypoint.sh
+
+# 改為使用 entrypoint（這會取代原本的 CMD）
+ENTRYPOINT ["/app/entrypoint.sh"]
