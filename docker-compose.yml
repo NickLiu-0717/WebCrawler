@@ -43,9 +43,9 @@ services:
       test: ["CMD", "curl", "-f", "-X", "POST", "-H", "Content-Type: application/json", "-d", '{"title": "Stock market reaches record high"}', "http://localhost:8000/classify/"]
       interval: 5s
       retries: 5
+      start_period: 45s
     volumes:
-      - ./app/model:/app/model
-    command: ["python3", "classifier_api.py"]
+      - ./classifier/model:/app/model
 
   webcrawler:
     build: .
@@ -71,7 +71,6 @@ services:
       SECRET_KEY: ${SECRET_KEY}
     ports:
       - "${PORT}:${PORT}"
-    command: ["/app/entrypoint.sh"]
 
 volumes:
   postgres_data:
