@@ -4,55 +4,55 @@
 ![code coverage badge](https://github.com/NickLiu-0717/Webcrawler/actions/workflows/ci.yml/badge.svg)
 ![Go version](https://img.shields.io/badge/go-1.23-blue)
 
-一個具備文章分類能力的分散式網路爬蟲系統，支援 JWT 身份驗證與 RabbitMQ 任務分派，使用 Python 預訓練模型進行內容分類，將結果儲存於 PostgreSQL，整個系統可部署於 Docker 環境中。此專案目標為實作一個可擴充、可維護的後端系統，並展示我作為後端工程師的技術整合與架構能力。
+A distributed web crawler system with article classification capabilities. It supports JWT authentication and task dispatch via RabbitMQ, utilizes a pre-trained Python model for content classification, stores the results in PostgreSQL, and is fully deployable in a Docker environment. This project aims to implement a scalable and maintainable backend system and showcase my backend development skills in integration and architecture design.
 
-## 專案功能
+## Features
 
-- 使用者給定網址後自動爬取該頁面內的文章內容
-- 透過 RabbitMQ 實現任務分散式處理
-- 使用 Python 的預訓練模型對文章內容進行分類
-- 分類後的文章資料儲存至 PostgreSQL 資料庫
-- 透過 JWT 驗證使用者身份，確保 API 存取安全
-- 使用 Docker 與 Docker Compose 進行容器化部署
+- Automatically crawls article content from a given URL
+- Distributed task processing via RabbitMQ
+- Content classification using a pre-trained Python model
+- Stores classified articles in a PostgreSQL database
+- JWT-based user authentication to ensure secure API access
+- Containerized deployment with Docker and Docker Compose
 
-## 技術棧
+## Tech Stack
 
-| 類別         | 技術                             |
+| Category         | Technology                             |
 |--------------|----------------------------------|
-| 語言         | Go, Python                       |
-| 爬蟲         | Go net/http                      |
-| 任務佇列     | RabbitMQ                         |
-| 模型分類     | Python + 預訓練分類模型           |
-| 身分認證     | JWT (JSON Web Token)             |
-| 資料庫       | PostgreSQL                       |
-| 容器化       | Docker, Docker Compose           |
+| Languages         | Go, Python                       |
+| Crawler         | Go net/http                      |
+| Task Queue     | RabbitMQ                         |
+| Classification     | Python + Pre-trained model          |
+| Authentication     | JWT (JSON Web Token)             |
+| Database       | PostgreSQL                       |
+| Containerization       | Docker, Docker Compose           |
 
-## 系統架構圖（簡述）
+## System Architecture (Overview)
 
 ```
-使用者 → REST API（含 JWT） → RabbitMQ（任務佇列）→ Worker（爬蟲 + 分類）→ PostgreSQL
-                                                       ↳ Python model 進行分類
+User → REST API (with JWT) → RabbitMQ (task queue) → Worker (crawling + classification) → PostgreSQL
+                                                    ↳ Python model for content classification
 ```
 
-## 快速開始
+## Getting Started
 
-### 前置需求
+### Prerequisites
 
 - Docker / Docker Compose
 - Python 3.x
-- Go 1.20+
+- Go 1.23+
 
-### 環境設定
+### Environment Setup
 
-1. 複製專案：
+1. Clone the repository：
 ```bash
 git clone https://github.com/yourname/WebCrawler.git
 cd WebCrawler
 ```
 
-2. 設定 `.env` 檔案
+2. Configure the `.env` file
 
-3. 下載預訓練模型至本地
+3. Download the pre-trained model locally
 ```
 python3 -c "
 from transformers import AutoModelForSequenceClassification, AutoTokenizer;
@@ -66,54 +66,54 @@ tokenizer.save_pretrained('app/model')
 "
 ```
 
-4. 啟動服務：
+4. Start the service：
 ```bash
 docker-compose up --build
 ```
 
-5. API 使用方式：
-- `http://localhost:<PORT>` （PORT 由 `.env` 中的設定決定，例如 `PORT=8080`）
+5.API Usage：
+- `http://localhost:<PORT>` （Port is defined in your `.env` file, e.g.,`PORT=8080`）
 
-### RabbitMQ 管理介面
-- 服務啟動後可透過 [http://localhost:15672](http://localhost:15672) 進入 RabbitMQ 管理介面
-- 預設帳密：`guest/guest`
+### RabbitMQ Management Interface
+- Once the service is up, access RabbitMQ at [http://localhost:15672](http://localhost:15672)
+- Default credentials: `guest/guest`
 
-## 專案結構
+## Project Structure
 
 ```
 WebCrawler/
-├── app/                   # 分類模型的 tokenizer 設定
+├── app/                   # Tokenizer and model config
 │   └── model/
-├── classifier/            # Python 類別分類 API（含 Dockerfile）
-├── config/                # Go 設定檔
-├── crawl/                 # 爬蟲邏輯
-├── handler/               # API handler（user/token/article 等）
-├── internal/              # 認證、資料庫、pubsub 模組
+├── classifier/            # Python classification API (with Dockerfile)
+├── config/                # Go config files
+├── crawl/                 # Crawling logic
+├── handler/               # API handler（user/token/article）
+├── internal/              # Auth, database, pubsub modules
 │   ├── auth/
 │   ├── database/
 │   ├── models/
 │   └── pubsub/
-├── service/               # 核心邏輯（分類、檢查 robots、萃取文章）
-├── sql/                   # SQL schema 與 queries
+├── service/               # Core logic (classification, robots check, content extraction)
+├── sql/                   # SQL schema and  queries
 │   ├── schema/
 │   └── queries/
-├── static/                # HTML 靜態頁面
-├── tests/                 # 單元測試
-├── Dockerfile             # 主服務 Docker 設定
-├── docker-compose.yml     # 多容器編排
-├── entrypoint.sh          # Docker 進入點 script
-└── README.md              # 專案說明文件
+├── static/                # HTML static pages
+├── tests/                 # Unit tests
+├── Dockerfile             # Docker config for main service
+├── docker-compose.yml     # Multi-container orchestration
+├── entrypoint.sh          # Docker entrypoint script
+└── README.md              # Project documentation
 
 ```
 
-## 待辦與改進方向
+## TODO & Future Improvements
 
-- [ ] 支援更多網站的文章擷取格式（ex: Medium, Reddit）
-- [ ] 改進分類模型效能與準確度
-- [ ] 加入前端管理介面可視化爬取結果
-- [ ] 支援多語言文章的分類與翻譯
+- [ ] Support more website formats (e.g., Medium, Reddit)
+- [ ] Improve classification model performance and accuracy
+- [ ] Add a frontend dashboard to visualize crawled results
+- [ ] Support multilingual article classification and translation
 
-## Contributing / 貢獻指南
-對專案有興趣的開發者歡迎 fork 並提交 PR（pull request）到 `main` 分支。
-若有較大幅度的修改，建議先透過 Issue 討論方向。
-請盡量遵守現有的程式風格並補上必要的測試。
+## Contributing
+Developers interested in this project are welcome to fork and submit a pull request (PR) to the `main` branch.
+For major changes, it's recommended to open an Issue for discussion first.
+Please follow the existing code style and include necessary tests where applicable.
