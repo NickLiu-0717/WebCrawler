@@ -4,8 +4,6 @@ FROM golang:1.23
 # 設定工作目錄
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y postgresql-client
-
 # 安裝 goose（SQL 遷移工具）
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
