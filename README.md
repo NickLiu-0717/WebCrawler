@@ -61,8 +61,8 @@ model_name = 'joeddav/xlm-roberta-large-xnli'
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-model.save_pretrained('app/model')
-tokenizer.save_pretrained('app/model')
+model.save_pretrained('classifier/model')
+tokenizer.save_pretrained('classifier/model')
 "
 ```
 
